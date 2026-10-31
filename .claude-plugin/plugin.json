@@ -1,0 +1,9 @@
+{
+  "name": "ai-sam",
+  "version": "1.0.0",
+  "description": "End to end workflow skills for any projects you work on",
+  "author": {
+    "name": "Sumeet Jadhav"
+  },
+  "skills": "./skills/"
+}

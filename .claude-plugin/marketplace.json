@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ai-sam",
+  "version": "1.0.0",
+  "description": "End to end workflow skills for any projects you work on",
+  "owner": {
+    "name": "Sumeet"
+  },
+  "plugins": [
+    {
+      "name": "ai-sam",
+      "source": "./",
+      "description": "Skills for end to end workflow management"
+    }
+  ]
+}

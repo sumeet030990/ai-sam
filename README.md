@@ -5,7 +5,7 @@ End to end workflow skills for any projects you work on, packaged as a Claude Co
 ## Skills
 
 - `/ai-sam:create-project-context` — interviews you about a repo (goals, stack, dependency manifests, commands) and writes a `PROJECT_CONTEXT.md` that later coding sessions read before writing code. In a parent folder it writes a `SYSTEM_CONTEXT.md` that maps the repos and how they connect.
-- `/ai-sam:create-jira-ticket` — not written yet.
+- `/ai-sam:create-jira-ticket` — asks the questions a story, bug, task, epic or spike needs, then writes the ticket in plain, point-wise English using the standard format for that type. Shows the finished ticket in the chat as Markdown, ready to paste into Jira or any rich text editor, with Retry and Retry with edits options before it is final.
 
 ### Project context for multi-repo projects
 
@@ -31,7 +31,6 @@ claude --plugin-dir /path/to/ai-sam
 
 This loads the plugin for that session only. It doesn't install anything or change your settings, and plain `claude` runs without it. The plugin is read at startup, so restart the session after editing a `SKILL.md`.
 
-`create-jira-ticket` can create real Jira tickets, so point it at a sandbox project while testing.
 
 ## Installing
 

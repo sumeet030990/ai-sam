@@ -1,6 +1,6 @@
 ---
 name: create-jira-ticket
-description: Interview the user and write a clear Jira ticket (story, bug, task, epic or spike) in plain, simple English with point-wise sections, using the standard format for its type. Shows the finished ticket in the chat as Markdown that pastes cleanly into Jira or any rich text editor such as Confluence, Word, Google Docs or email. Use when the user says "create a Jira ticket", "write a ticket", "draft a story", "log a bug", "write up this task", "turn this into a ticket", or pastes rough notes and asks for a ticket. Does not save files or create the ticket in Jira.
+description: Interview the user and write a clear Jira ticket (story, bug, task, epic or spike) in plain, simple English with point-wise sections, using the standard format for its type or the team's own format saved in JIRA_CONFIG.md by setup-jira-config. Shows the finished ticket in the chat as Markdown that pastes cleanly into Jira or any rich text editor such as Confluence, Word, Google Docs or email. Use when the user says "create a Jira ticket", "write a ticket", "draft a story", "log a bug", "write up this task", "turn this into a ticket", or pastes rough notes and asks for a ticket. Does not save files or create the ticket in Jira.
 ---
 
 # Create Jira Ticket
@@ -44,13 +44,27 @@ Write as if explaining to a smart colleague who doesn't know the system. Apply t
 8. **Testable acceptance criteria.** Each one is a single check someone can say yes or no to. Start each with the person or the system: "The admin can…", "The system shows…".
 9. **Friendly but neutral.** No blame, no slang, no emojis, no exclamation marks.
 
+## Step 0 — Load the team config
+
+Before the first question, look for saved team conventions (written by `/ai-sam:setup-jira-config`):
+
+1. **Local file** — `JIRA_CONFIG.local.md` in the repo root (`git rev-parse --show-toplevel`; the current folder if it isn't a git repo). One person's overrides of the team rules.
+2. **Repo file** — `JIRA_CONFIG.md` in the repo root. The team's shared rules.
+3. **User file** — `~/.claude/ai-sam/JIRA_CONFIG.md`. Personal defaults across every repo.
+
+Merge them section by section: `Summary format`, `Acceptance criteria style`, and each type under `Templates` (`Story`, `Bug`, `Task`, `Epic`, `Spike`). For each section, use the first file in the order above that sets it, otherwise the standard behaviour in this skill. A section set to `Standard` means the standard behaviour.
+
+- If a file exists, say in one line which file(s) you're using. When the local file overrides the repo file, name the overridden sections, e.g. "Using JIRA_CONFIG.local.md (Acceptance criteria style) over JIRA_CONFIG.md". Don't ask about the settings — just follow them.
+- If none exists, carry on with the standard behaviour and mention once, in one line, that `/ai-sam:setup-jira-config` can save the team's summary format, acceptance criteria style and templates.
+- Don't edit the config files from this skill. If the user wants a setting changed, point them to `/ai-sam:setup-jira-config`.
+
 ## Step 1 — What kind of ticket
 
 If the user pasted notes or gave a description with the request, read it first and use it to suggest answers.
 
 Ask with AskUserQuestion (the first call of a run, so no **Retry previous answer**) — **Ticket type**: Story (new feature or change for users), Bug (something is broken), Task (work that needs doing, e.g. setup or clean-up); Epic and Spike (research) through **Other**. Recommend the type that fits the user's notes. If the notes already make the type obvious, skip the question and say which type you picked.
 
-Always use the standard format for that type (see **Standard templates**). Don't ask about custom templates.
+Use the config's custom template for that type if Step 0 found one; otherwise use the standard format (see **Standard templates**). Don't ask the user which template to use.
 
 ## Step 2 — Gather the details
 
@@ -61,6 +75,7 @@ Ask only what the ticket type needs. Group questions (up to 4 per call), suggest
 ### All ticket types
 
 - **Summary (title)** — one line, under ~80 characters, plain words. Suggest 2–3 drafts. Bugs: "<What is wrong> when <situation>". Stories: "<Who> can <do something>". Tasks: "<Verb> <thing>".
+  - If the config sets a **Summary format**, follow it for the types it applies to. **Tags**: suggest the tag(s) that fit the work (one or several, as the config allows) and put them first, e.g. `[FE] Applicant can upload documents`. **Pattern**: fill the pattern, using its example as the model.
 - **Why it matters** — the problem or the value, in one or two points.
 
 ### Story
@@ -100,13 +115,35 @@ Ask only what the ticket type needs. Group questions (up to 4 per call), suggest
 - Time limit (time-box), e.g. 2 days.
 - What the output should be (a recommendation, a demo, a document).
 
+### Custom templates
+
+When the config gives a custom template for the ticket type, it replaces the per-type list above. Ask for what each of its sections needs instead:
+
+- Ask the Summary and Why questions from **All ticket types** only if the template has a place for them.
+- For each other section, ask one question built from its heading and any `<!-- comment -->` under it, grouping related sections (up to 4 per call). Draft answers in a `preview` where you can.
+- Fill every `<placeholder>`. Drop sections and lines the user has no answer for, unless they say to keep them as `To be decided`.
+- Keep the template's section names and order. Apply the **Writing style** rules to the content.
+
+### Acceptance criteria style
+
+If the config sets **Gherkin**, write acceptance criteria (in standard and custom templates) as scenarios instead of checklist items, unless the config says Bugs keep a checklist:
+
+```markdown
+**Scenario: <short name>**
+- **Given** <starting situation>
+- **When** <action>
+- **Then** <result someone can check>
+```
+
+One scenario per behaviour. Each **Then** is a single yes-or-no check.
+
 ### Optional fields — ask once
 
 Ask one multi-select AskUserQuestion: "Do you want to add any of these?" — Priority, Labels / components, Story points / estimate, Links (related tickets, designs, documents), Dependencies or blockers, Technical notes. Then ask only about the ones picked. Leave the rest out of the ticket entirely (don't write empty headings).
 
 ## Step 3 — Draft, review, and finish
 
-1. Write the ticket using the matching template below, the **Writing style** rules, and the answers from Step 2.
+1. Write the ticket using the config's custom template for this type or the matching standard template below, the config's summary and acceptance criteria style, the **Writing style** rules, and the answers from Step 2.
 2. Show the full draft in the chat and ask with AskUserQuestion: Looks good (Recommended), Retry, Retry with edits, Retry previous answer.
    - **Retry** — rewrite the whole ticket from the same answers in a fresh way, then show it and ask again.
    - **Retry with edits** — ask what to change, with common edits as options (Make it shorter, Simpler language, Change a section) and **Other** for their own. Apply only those changes, then show it and ask again.
@@ -127,7 +164,7 @@ If the user says they use Jira Server / Data Center, use Jira wiki markup instea
 
 ## Standard templates
 
-The section order for each ticket type. Drop optional sections the user didn't ask for, and lines whose answer you don't have (such as a role nobody mentioned).
+The section order for each ticket type, used when the config doesn't give a custom template for it. Drop optional sections the user didn't ask for, and lines whose answer you don't have (such as a role nobody mentioned).
 
 ### Story
 

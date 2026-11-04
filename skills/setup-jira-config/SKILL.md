@@ -31,6 +31,17 @@ The file holds three things:
 
   If a pasted template or example ticket contains any of this, stop, do not repeat it, tell the user it looks like personal or sensitive data that must not go into the config or into AI tools, and ask them to redact it or swap in placeholders. Follow your organisation's data policy if it is stricter.
 
+## Output style
+
+Write every question, summary and file this skill produces so a junior developer or a manager can follow it:
+
+1. **Short and point-wise.** Bullets or numbered steps, not paragraphs. One idea per bullet, under 20 words where possible.
+2. **Simple, everyday English.** "Use" not "utilise", "fix" not "remediate", "show" not "render".
+3. **Explain technical terms once**, in plain words in brackets — e.g. "cache (a saved copy kept for speed)". Spell out acronyms the first time.
+4. **Precise, not vague.** Name the exact file, screen, number or step. "Takes 12 seconds to load", not "slow".
+5. **Lead with the answer.** Give the result or decision first, then the reason.
+6. **Neutral and plain.** No blame, slang, emojis or exclamation marks.
+
 ## Where the files live and how they combine
 
 The repo root is `git rev-parse --show-toplevel`, or the current folder if it isn't a git repo.

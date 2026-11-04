@@ -32,6 +32,17 @@ For multi-repo projects the order is: **run in each repo first, then run in the 
 - If a `PROJECT_CONTEXT.md` (or, in parent mode, `SYSTEM_CONTEXT.md`) already exists, read it first, show the user what it holds, and ask whether to update it or replace it. Default to updating — keep sections the user does not change, and keep the existing change log rows.
 - When updating, check for drift before asking anything else. In repo mode: confirm every listed manifest file still exists, re-read the runtime and key framework versions and compare them with the **Tech stack** table, and check the listed commands still exist in their source files. In parent mode: confirm each component path and context file still exists, and look for new or removed components. Show the user what changed, update those rows after they confirm, and name the drift fixes in the change log row.
 
+## Output style
+
+Write every question, summary and file this skill produces so a junior developer or a manager can follow it:
+
+1. **Short and point-wise.** Bullets or numbered steps, not paragraphs. One idea per bullet, under 20 words where possible.
+2. **Simple, everyday English.** "Use" not "utilise", "fix" not "remediate", "show" not "render".
+3. **Explain technical terms once**, in plain words in brackets — e.g. "cache (a saved copy kept for speed)". Spell out acronyms the first time.
+4. **Precise, not vague.** Name the exact file, screen, number or step. "Takes 12 seconds to load", not "slow".
+5. **Lead with the answer.** Give the result or decision first, then the reason.
+6. **Neutral and plain.** No blame, slang, emojis or exclamation marks.
+
 ## Step 0 — Choose the mode
 
 Look at the current folder before asking:

@@ -8,6 +8,15 @@ End to end workflow skills for any projects you work on, packaged as a Claude Co
 - `/ai-sam:create-jira-ticket` — asks the questions a story, bug, task, epic or spike needs, then writes the ticket in plain, point-wise English using the standard format for that type. Shows the finished ticket in the chat as Markdown, ready to paste into Jira or any rich text editor, with Retry and Retry with edits options before it is final. Follows the team's `JIRA_CONFIG.md` when one exists.
 - `/ai-sam:setup-jira-config` — asks once how your team writes tickets (summary format such as `[FE]` tags or a custom pattern, checklist or Gherkin acceptance criteria, and custom templates that fully replace the standard Story, Bug, Task, Epic or Spike formats) and saves it in a `JIRA_CONFIG.md`. Save it for the team per repo (`JIRA_CONFIG.md` in the repo root, shareable by committing it), for yourself across all repos (`~/.claude/ai-sam/JIRA_CONFIG.md`), or for yourself in one repo (`JIRA_CONFIG.local.md` in the repo root, gitignored) to override the team's rules without changing them for anyone else.
 
+- `/ai-sam:design-solution` — acts as the project's senior tech lead. Takes a ticket (a Jira key or pasted text), reads `PROJECT_CONTEXT.md` / `SYSTEM_CONTEXT.md`, scans the code, and shows a plan: the approach, which files to update, which new files to create and where, which file delivers each acceptance criterion, tests, risks and open questions. Works from a code scan alone when no context file exists. Read-only.
+- `/ai-sam:analyze-jira-ticket` — checks whether a ticket is ready to start: clear goal, testable acceptance criteria, gaps, questions to ask, the code areas it touches, size and risks. Gives a Ready / Needs small fixes / Not ready verdict, and checks the ticket against `JIRA_CONFIG.md` when one exists. Read-only.
+
+All skills write in short, point-wise, plain English, so a junior developer or a manager can follow the results.
+
+## Subagents
+
+- `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `design-solution` and `analyze-jira-ticket`. It learns the project from the context files and the business rules from the code, then works out which files change. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
+
 ### How Jira configs combine
 
 Settings are merged section by section (summary format, acceptance criteria style, and each ticket type's template). For each section the highest file that sets it wins:

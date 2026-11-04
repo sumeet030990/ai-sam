@@ -9,9 +9,8 @@ Take a ticket and build it: plan, code, test, check. The user sees the plan befo
 
 Where it fits:
 
-1. `/ai-sam:analyze-jira-ticket` — is the ticket ready?
-2. `/ai-sam:design-solution` — how should we build it?
-3. `/ai-sam:implement-ticket` — build it. (This skill.)
+1. `/ai-sam:analyze-ticket` — is the ticket ready, and how should we build it?
+2. `/ai-sam:implement-ticket` — build it. (This skill.)
 
 ## Ground rules
 
@@ -53,7 +52,7 @@ Write every question, summary and file this skill produces so a junior developer
 
 Check the ticket for personal or secret data (see the ground rules) before going on.
 
-**Epics and spikes:** don't build them. An epic is too big for one run — ask which of its stories to build. A spike's output is a decision, not code — offer `/ai-sam:design-solution` instead.
+**Epics and spikes:** don't build them. An epic is too big for one run — ask which of its stories to build. A spike's output is a decision, not code — offer `/ai-sam:analyze-ticket` instead.
 
 ## Step 2 — Quick readiness check
 
@@ -63,7 +62,7 @@ Check only what blocks building:
 - Each criterion can be checked with a yes or no.
 - A bug has steps to reproduce, or enough detail to find the code.
 
-If something blocks, ask — **Ticket gaps**: Answer the gaps now (Recommended), Run `/ai-sam:analyze-jira-ticket` first, Build with my best reading and list my assumptions. Small gaps go under **Assumptions** in the final report.
+If something blocks, ask — **Ticket gaps**: Answer the gaps now (Recommended), Run `/ai-sam:analyze-ticket` first, Build with my best reading and list my assumptions. Small gaps go under **Assumptions** in the final report.
 
 ## Step 3 — Load the project
 
@@ -77,11 +76,11 @@ If something blocks, ask — **Ticket gaps**: Answer the gaps now (Recommended),
 ## Step 4 — Get an approved plan
 
 1. **Reuse a plan if one exists:**
-   - a `/ai-sam:design-solution` plan earlier in this conversation, or
+   - a `/ai-sam:analyze-ticket` plan earlier in this conversation, or
    - a saved plan at `docs/design/<ticket key>.md`.
 
    Say in one line which plan you are using. Check its files still exist.
-2. **No plan:** start the `tech-lead` subagent (`ai-sam:tech-lead`) in **design** mode. Give it the full ticket, the answers from Step 2, the repo root(s) and the context file paths.
+2. **No plan:** start the `tech-lead` subagent (`ai-sam:tech-lead`). Give it the full ticket, the answers from Step 2, the repo root(s) and the context file paths.
 3. Show the plan in the chat. Add, at the top:
    - **Build by:** the agents you expect to use (see Step 6a), or Main session.
    - **Where:** the branch or worktree you expect to use in Step 5.

@@ -242,7 +242,7 @@ Role-specific content to add:
    **How to use them**
    - Ask for an agent by name, e.g. "Use the frontend-dev agent to add a date filter to the cases list."
    - Or type `@` and pick the agent.
-   - For work across layers, run `/ai-sam:design-solution` first. The plan says which agent builds each part.
+   - For work across layers, run `/ai-sam:analyze-ticket` first. The plan says which agent builds each part.
    - Run `/agents` to see or edit them. Restart the session if they don't show yet.
 
    > **Warning — token cost:** each agent re-reads the files it needs, so using agents costs more tokens than the main session. Do small, single-file fixes in the main session.

@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: Senior tech lead for the current project. Reads the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context, learns the business rules from the code, and works out how to build a ticket — the approach, which existing files change, which new files are needed, and the risks. Works from a code scan alone when no context file exists. Read-only — never edits files. Used by the design-solution and analyze-jira-ticket skills; also use directly for "how should we build this", "which files does this touch" or architecture questions about the repo.
+description: Senior tech lead for the current project. Reads the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context, learns the business rules from the code, and works out how to build a ticket — the approach, which existing files change, which new files are needed, and the risks. Works from a code scan alone when no context file exists. Read-only — never edits files. Used by the design-solution, analyze-jira-ticket and implement-ticket skills; also use directly for "how should we build this", "which files does this touch" or architecture questions about the repo.
 tools: Read, Grep, Glob, Bash
 ---
 

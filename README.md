@@ -10,13 +10,14 @@ End to end workflow skills for any projects you work on, packaged as a Claude Co
 
 - `/ai-sam:design-solution` — acts as the project's senior tech lead. Takes a ticket (a Jira key or pasted text), reads `PROJECT_CONTEXT.md` / `SYSTEM_CONTEXT.md`, scans the code, and shows a plan: the approach, which files to update, which new files to create and where, which file delivers each acceptance criterion, tests, risks and open questions. Works from a code scan alone when no context file exists. Read-only.
 - `/ai-sam:analyze-jira-ticket` — checks whether a ticket is ready to start: clear goal, testable acceptance criteria, gaps, questions to ask, the code areas it touches, size and risks. Gives a Ready / Needs small fixes / Not ready verdict, and checks the ticket against `JIRA_CONFIG.md` when one exists. Read-only.
+- `/ai-sam:implement-ticket` — builds a ticket end to end. Reuses or makes a plan with `tech-lead`, and waits for your approval before writing code. If you're already on the ticket's branch it works there; otherwise it asks whether to create a branch, create a worktree or use the current branch. Then it writes the code and a test for every acceptance criterion, runs the project's test, lint and build commands, and shows a report of what changed. Checks for a builder agent that owns each part (from `create-team`, `.claude/agents/` or `~/.claude/agents/`) and hands it the ticket, plan, branch and rules in one brief; builds the rest itself. Never commits, pushes, opens a PR or changes Jira without asking.
 - `/ai-sam:create-team` — scans the repo you're in and suggests one builder subagent per layer (Frontend, Backend, Database, API, DevOps, QA test automation and more), each backed by the files that justify it. Writes the ones you pick to `.claude/agents/` (shared with the team when committed) or `~/.claude/agents/` (only you), and lists them in a **Team** section of the repo's `CLAUDE.md`. Each agent knows the folders it owns, the patterns to copy, the commands to run and what it must not touch. `tech-lead` then names which agent builds each part of a plan.
 
 All skills write in short, point-wise, plain English, so a junior developer or a manager can follow the results.
 
 ## Subagents
 
-- `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `design-solution` and `analyze-jira-ticket`. It learns the project from the context files and the business rules from the code, then works out which files change. When the repo has a team from `create-team`, it says which agent builds each part. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
+- `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `design-solution`, `analyze-jira-ticket` and `implement-ticket`. It learns the project from the context files and the business rules from the code, then works out which files change. When the repo has a team from `create-team`, it says which agent builds each part. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
 
 ### How Jira configs combine
 

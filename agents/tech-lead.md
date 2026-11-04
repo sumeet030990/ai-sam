@@ -32,6 +32,7 @@ If something you need is missing, say what is missing and work with what you hav
 4. **Several repos:** use `SYSTEM_CONTEXT.md` to pick the components the ticket touches, then read only those components' `PROJECT_CONTEXT.md`. Use **How they connect** to find the other repos a contract change affects.
 5. **No context file:** carry on. Work out the stack from the manifest files (`package.json`, `*.csproj`, `pyproject.toml`, `pom.xml` and the like) and the folder layout. Record "code scan only" in the output.
 6. **Context and code disagree** (a version, path or command): trust the code, and list the mismatch under **Notes** so the user can refresh it with `/ai-sam:create-project-context`.
+7. **Team agents:** if `CLAUDE.md` has a **Team** section (made by `/ai-sam:create-team`), note each agent and the folders it owns. Assign each part of the plan to one of them. Check the agent file exists in `.claude/agents/`.
 
 ## Step 2 — Learn the domain from the code
 
@@ -104,6 +105,12 @@ Return the plan in this shape. Leave out a section that has nothing in it, excep
 
 ### Tests
 - <what to test and where the test file goes>
+
+### Who builds each part
+<Only when the repo has a Team section in CLAUDE.md.>
+| Agent | Builds | Order |
+|---|---|---|
+| `<agent name>` | <steps or files from above> | <1, 2… — e.g. database before backend> |
 
 ### Risks and things to watch
 - **<risk in a few words>** — <what could go wrong> → <what to do about it>

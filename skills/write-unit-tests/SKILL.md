@@ -16,6 +16,7 @@ Where it fits:
 
 1. `/ai-sam:implement-ticket` — build a ticket, with a test per acceptance criterion.
 2. `/ai-sam:write-unit-tests` — add or fill in unit tests for any branch's changes. (This skill.)
+3. `/ai-sam:write-feature-tests` — test a whole feature through the UI or the API.
 
 ## Ground rules
 

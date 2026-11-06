@@ -1,11 +1,11 @@
 ---
-name: setup-jira-config
-description: Interview the user once about their team's Jira ticket conventions (summary format, acceptance criteria style, and custom templates that replace the standard Story, Bug, Task, Epic or Spike formats) and save them in a JIRA_CONFIG.md file that create-jira-ticket reads before writing a ticket. Saves a personal user-level file (~/.claude/ai-sam/JIRA_CONFIG.md), a shared repo-level file (JIRA_CONFIG.md in the repo root) that overrides it section by section, or a personal repo-level file (JIRA_CONFIG.local.md, gitignored) that overrides the team's repo file for one person. Use when the user says "set up Jira config", "configure Jira tickets", "save our ticket template", "use our team's ticket format", "set the summary tags", "use Gherkin acceptance criteria", or wants create-jira-ticket to follow team rules. Also use to update or reset an existing JIRA_CONFIG.md. Does not connect to Jira or create tickets.
+name: setup-ticket-config
+description: Interview the user once about their team's ticket conventions (for Jira, Bitbucket, Azure DevOps, GitHub, GitLab or any other tracker) (summary format, acceptance criteria style, and custom templates that replace the standard Story, Bug, Task, Epic or Spike formats) and save them in a TICKET_CONFIG.md file that create-ticket reads before writing a ticket. Saves a personal user-level file (~/.claude/ai-sam/TICKET_CONFIG.md), a shared repo-level file (TICKET_CONFIG.md in the repo root) that overrides it section by section, or a personal repo-level file (TICKET_CONFIG.local.md, gitignored) that overrides the team's repo file for one person. Use when the user says "set up ticket config", "set up Jira config", "configure Jira tickets", "configure Bitbucket issues", "save our ticket template", "use our team's ticket format", "set the summary tags", "use Gherkin acceptance criteria", or wants create-ticket to follow team rules. Also use to update or reset an existing TICKET_CONFIG.md. Does not connect to any tracker or create tickets.
 ---
 
-# Setup Jira Config
+# Setup Ticket Config
 
-Ask the user how their team writes Jira tickets, then save the answers in a `JIRA_CONFIG.md` file. `/ai-sam:create-jira-ticket` reads that file and follows it, so the user doesn't repeat these choices on every ticket.
+Ask the user how their team writes tickets (in Jira, Bitbucket, Azure DevOps, GitHub, GitLab or any other tracker), then save the answers in a `TICKET_CONFIG.md` file. `/ai-sam:create-ticket` reads that file and follows it, so the user doesn't repeat these choices on every ticket.
 
 The file holds three things:
 
@@ -22,7 +22,7 @@ The file holds three things:
   - The user can always type their own answer in the built-in **Other** textbox. Say so in the question text.
   - Group up to 4 related questions in one call.
 - **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, ask which answer to change (default: the one just before), re-ask it, and return to where you were. The user can also say "go back" at any time.
-- **Only ask about what's being changed.** Each section is optional. A section the user skips is left out of the file, and create-jira-ticket falls back to the next file or the standard behaviour for it.
+- **Only ask about what's being changed.** Each section is optional. A section the user skips is left out of the file, and create-ticket falls back to the next file or the standard behaviour for it.
 - **No personal or secret data.** Templates and examples must use placeholders (`<role>`, `<page>`) or made-up data ("Test User", "Applicant A"). Never copy into the file:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -48,11 +48,11 @@ The repo root is `git rev-parse --show-toplevel`, or the current folder if it is
 
 | Priority | Scope | Path | Use for |
 |---|---|---|---|
-| 1 (highest) | Local | `JIRA_CONFIG.local.md` in the repo root | One person's overrides of the team rules in one repo; gitignored, never shared |
-| 2 | Repo | `JIRA_CONFIG.md` in the repo root | Team rules for one repo; can be committed and shared |
-| 3 | User | `~/.claude/ai-sam/JIRA_CONFIG.md` | Personal defaults across every repo |
+| 1 (highest) | Local | `TICKET_CONFIG.local.md` in the repo root | One person's overrides of the team rules in one repo; gitignored, never shared |
+| 2 | Repo | `TICKET_CONFIG.md` in the repo root | Team rules for one repo; can be committed and shared |
+| 3 | User | `~/.claude/ai-sam/TICKET_CONFIG.md` | Personal defaults across every repo |
 
-The files combine **section by section**: for each section, the highest-priority file that sets it wins. The sections are: `Summary format`, `Acceptance criteria style`, and each template type under `Templates` (`Story`, `Bug`, `Task`, `Epic`, `Spike`) on its own. Anything no file sets uses create-jira-ticket's standard behaviour.
+The files combine **section by section**: for each section, the highest-priority file that sets it wins. The sections are: `Summary format`, `Acceptance criteria style`, and each template type under `Templates` (`Story`, `Bug`, `Task`, `Epic`, `Spike`) on its own. Anything no file sets uses create-ticket's standard behaviour.
 
 A section set to `Standard` means "use the standard behaviour" and still counts as set, so a repo file can switch a user-level custom template back to the standard one, and a local file can do the same for a team template.
 
@@ -61,10 +61,13 @@ Keep a local file small: only the sections the person wants different from the t
 ## Step 0 — Choose the scope
 
 1. Check which of the three files already exist and read them.
+   - Older versions saved them as `JIRA_CONFIG.md` / `JIRA_CONFIG.local.md` (same paths, same format).
+   - If you find an old-named file, ask: **Rename it to TICKET_CONFIG (Recommended)** / **Leave it as is**.
+   - On rename, use `git mv` for a tracked file, or a plain rename otherwise. Don't commit.
 2. Ask with AskUserQuestion (first call of the run, so no **Retry previous answer**) — **Which config do you want to set up?**
-   - **This repo (team)** — writes `JIRA_CONFIG.md` in the repo root. Recommend this when the current folder is a git repo and it has no `JIRA_CONFIG.md` yet.
-   - **Just me, this repo (override the team config)** — writes `JIRA_CONFIG.local.md` in the repo root. Recommend this when the repo already has a `JIRA_CONFIG.md`. Offer it only inside a git repo.
-   - **Just me (all repos)** — writes `~/.claude/ai-sam/JIRA_CONFIG.md`. Recommend this outside a git repo.
+   - **This repo (team)** — writes `TICKET_CONFIG.md` in the repo root. Recommend this when the current folder is a git repo and it has no `TICKET_CONFIG.md` yet.
+   - **Just me, this repo (override the team config)** — writes `TICKET_CONFIG.local.md` in the repo root. Recommend this when the repo already has a `TICKET_CONFIG.md`. Offer it only inside a git repo.
+   - **Just me (all repos)** — writes `~/.claude/ai-sam/TICKET_CONFIG.md`. Recommend this outside a git repo.
 
    Name the full path in each option's description, and note which files already exist.
 3. If the chosen file exists, show a short summary of what it sets and ask: **Update some sections (Recommended)**, **Start over**, **Show the file only**.
@@ -78,7 +81,7 @@ Keep a local file small: only the sections the person wants different from the t
 
 Ask **How should ticket summaries (titles) be written?** with a `preview` example for each option:
 
-- **Plain** — create-jira-ticket's standard patterns ("<Who> can <do something>", "<What is wrong> when <situation>", "<Verb> <thing>"). Saved as `Standard`.
+- **Plain** — create-ticket's standard patterns ("<Who> can <do something>", "<What is wrong> when <situation>", "<Verb> <thing>"). Saved as `Standard`.
 - **Tags in front** — one or more tags before the summary, e.g. `[FE] Applicant can upload documents`.
 - **Custom pattern** — the team's own shape, e.g. `<Area>: <what changes>`.
 
@@ -91,7 +94,7 @@ If **Tags in front**:
 If **Custom pattern**:
 
 1. Ask for the pattern with `<placeholders>` (Other textbox), suggesting one or two drafts.
-2. Ask for one example summary written in that pattern, using made-up content, so create-jira-ticket has a model to copy.
+2. Ask for one example summary written in that pattern, using made-up content, so create-ticket has a model to copy.
 3. Ask whether it applies to all ticket types or only some, and what the others use.
 
 Keep the same rules on length: under ~80 characters, plain words.
@@ -100,7 +103,7 @@ Keep the same rules on length: under ~80 characters, plain words.
 
 Ask **How should acceptance criteria be written?** with a `preview` of each:
 
-- **Checklist** — create-jira-ticket's standard. Saved as `Standard`.
+- **Checklist** — create-ticket's standard. Saved as `Standard`.
 
   ```markdown
   - [ ] The applicant can upload a PDF up to 10 MB
@@ -129,15 +132,15 @@ A custom template **fully replaces** the standard one for that ticket type. Type
    - In the local scope, if the repo file has custom templates, also offer to set a type back to `Standard` for this person.
 2. For each picked type, ask **How do you want to give the <type> template?**
    - **Paste it in the chat (Recommended)** — the user's next message is the template. Tell them to use `<angle-bracket placeholders>` for anything that changes per ticket.
-   - **Read it from a file** — ask for the path in **Other**, then read it. Accept Markdown or plain text; if it's Jira wiki markup, convert it to Markdown and show the result.
-   - **Start from the standard template** — show the standard template for that type (from create-jira-ticket's **Standard templates**) in a `preview`, ask the user to paste back their edited version.
+   - **Read it from a file** — ask for the path in **Other**, then read it. Accept Markdown or plain text; if it's Jira wiki markup or another tracker's markup, convert it to Markdown and show the result.
+   - **Start from the standard template** — show the standard template for that type (from create-ticket's **Standard templates**) in a `preview`, ask the user to paste back their edited version.
    - **Copy from an example ticket** — the user pastes a real ticket they like; you turn it into a template by swapping every specific detail for a `<placeholder>`. Check it carefully for personal data first (see **Ground rules**).
 3. Check each template and fix it with the user before saving:
    - It has headings (`###`) for each section. If it's one block of text, propose a split into sections.
    - Content that changes per ticket is a `<placeholder>`, not real data.
-   - It has no `**Summary:**` line, or if it does, the line follows Step 1's summary format. (create-jira-ticket shows the summary separately either way.)
+   - It has no `**Summary:**` line, or if it does, the line follows Step 1's summary format. (create-ticket shows the summary separately either way.)
    - Note which section holds acceptance criteria, if any, so Step 2's style can be applied to it.
-   - Add a one-line HTML comment under any section heading whose purpose isn't obvious, saying what goes there (e.g. `<!-- Which existing features this could break -->`). create-jira-ticket turns these into questions.
+   - Add a one-line HTML comment under any section heading whose purpose isn't obvious, saying what goes there (e.g. `<!-- Which existing features this could break -->`). create-ticket turns these into questions.
 4. Show the cleaned template and ask: **Looks good (Recommended)**, **Retry with edits**, **Retry previous answer**. For **Retry with edits**, ask what to change (Rename a section, Add a section, Remove a section, Other), apply only that, and show it again.
 
 ## Step 4 — Confirm and write
@@ -145,23 +148,23 @@ A custom template **fully replaces** the standard one for that ticket type. Type
 1. Build the file from the **Config file format** below with only the sections the user set (plus, in **Update some sections**, the sections already in the file).
 2. Show the whole file in the chat and ask: **Save it (Recommended)**, **Retry with edits**, **Retry previous answer**.
 3. On **Save it**, write the file. For the user scope, create `~/.claude/ai-sam/` if needed. Overwrite an existing file only after the user has seen the new version in step 2.
-4. For the local scope, check that git ignores the file (`git check-ignore -q JIRA_CONFIG.local.md` from the repo root). If it doesn't, ask **Add JIRA_CONFIG.local.md to .gitignore? (Recommended)** / **No, I'll handle it**, and on yes append the line to the repo root's `.gitignore` (create it if missing). Don't commit either file.
+4. For the local scope, check that git ignores the file (`git check-ignore -q TICKET_CONFIG.local.md` from the repo root). If it doesn't, ask **Add TICKET_CONFIG.local.md to .gitignore? (Recommended)** / **No, I'll handle it**, and on yes append the line to the repo root's `.gitignore` (create it if missing). Don't commit either file.
 5. Finish with three short lines:
    - where the file was saved;
    - for the repo scope: it can be committed so the team shares it (don't commit it yourself); for the local scope: it stays on this machine and only affects this user's tickets;
-   - `/ai-sam:create-jira-ticket` will now use it — and if more than one file exists, which file each section comes from.
+   - `/ai-sam:create-ticket` will now use it — and if more than one file exists, which file each section comes from.
 
 ## Config file format
 
-All three scopes use the same format. Use these exact headings, because create-jira-ticket merges files by them. Leave out any section the user didn't set.
+All three scopes use the same format. Use these exact headings, because create-ticket merges files by them. Leave out any section the user didn't set.
 
 `````markdown
-# Jira Ticket Config
+# Ticket Config
 
-<!-- Written by /ai-sam:setup-jira-config and read by /ai-sam:create-jira-ticket.
-     Section by section, JIRA_CONFIG.local.md overrides the repo's JIRA_CONFIG.md,
-     which overrides ~/.claude/ai-sam/JIRA_CONFIG.md.
-     "Standard" means use create-jira-ticket's built-in behaviour. -->
+<!-- Written by /ai-sam:setup-ticket-config and read by /ai-sam:create-ticket.
+     Section by section, TICKET_CONFIG.local.md overrides the repo's TICKET_CONFIG.md,
+     which overrides ~/.claude/ai-sam/TICKET_CONFIG.md.
+     "Standard" means use create-ticket's built-in behaviour. -->
 
 ## Summary format
 - **Style:** <Standard | Tags | Pattern>

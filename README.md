@@ -8,8 +8,8 @@ Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for 
 
 | Step | Stage | Skills |
 | --- | --- | --- |
-| 1 | Set up (once per repo or team) | `create-project-context`, `setup-jira-config`, `create-team` |
-| 2 | Write and check the ticket | `create-jira-ticket`, `analyze-ticket` |
+| 1 | Set up (once per repo or team) | `create-project-context`, `setup-ticket-config`, `create-team` |
+| 2 | Write and check the ticket | `create-ticket`, `analyze-ticket` |
 | 3 | Build | `implement-ticket` |
 | 4 | Test | `write-unit-tests`, `write-feature-tests`, `write-test-cases`, `run-test-report` |
 | 5 | Review | `review-pr` |
@@ -30,20 +30,20 @@ Teaches Claude your project, so later skills write code that fits it.
 - **Output:** `PROJECT_CONTEXT.md` or `SYSTEM_CONTEXT.md`.
 - **Used by:** `analyze-ticket`, `implement-ticket`, `review-pr`, the test skills.
 
-#### 1.2 `/ai-sam:setup-jira-config`
+#### 1.2 `/ai-sam:setup-ticket-config`
 
-Saves how your team writes Jira tickets, once.
+Saves how your team writes tickets, once. Works for any tracker: Jira, Bitbucket, Azure DevOps, GitHub, GitLab and others.
 
 1. Asks for the summary format (for example `[FE]` tags or a custom pattern).
 2. Asks for the acceptance criteria style: checklist or Gherkin (Given / When / Then).
 3. Asks for any custom templates that fully replace the standard Story, Bug, Task, Epic or Spike formats.
 4. Asks where to save it:
-   - **Team, this repo:** `JIRA_CONFIG.md` in the repo root. Share it by committing it.
-   - **Just you, all repos:** `~/.claude/ai-sam/JIRA_CONFIG.md`.
-   - **Just you, this repo:** `JIRA_CONFIG.local.md` in the repo root (gitignored). Overrides the team's rules for you only.
+   - **Team, this repo:** `TICKET_CONFIG.md` in the repo root. Share it by committing it.
+   - **Just you, all repos:** `~/.claude/ai-sam/TICKET_CONFIG.md`.
+   - **Just you, this repo:** `TICKET_CONFIG.local.md` in the repo root (gitignored). Overrides the team's rules for you only.
 
-- **Output:** a `JIRA_CONFIG` file. See [How Jira configs combine](#how-jira-configs-combine).
-- **Used by:** `create-jira-ticket`, `analyze-ticket`, `review-pr`.
+- **Output:** a `TICKET_CONFIG` file. See [How ticket configs combine](#how-ticket-configs-combine).
+- **Used by:** `create-ticket`, `analyze-ticket`, `review-pr`.
 
 #### 1.3 `/ai-sam:create-team`
 
@@ -60,14 +60,14 @@ Creates builder subagents (helper agents), one per layer of the repo.
 
 ### Step 2 — Write and check the ticket
 
-#### 2.1 `/ai-sam:create-jira-ticket`
+#### 2.1 `/ai-sam:create-ticket`
 
-Writes a clear Jira ticket from your answers or rough notes.
+Writes a clear ticket from your answers or rough notes, for any tracker (Jira, Bitbucket, Azure DevOps, GitHub, GitLab and others).
 
 1. Asks the questions a story, bug, task, epic or spike needs.
 2. Writes the ticket in plain, point-wise English, in the standard format for that type.
-3. Follows `JIRA_CONFIG.md` when one exists.
-4. Shows the ticket in the chat as Markdown, ready to paste into Jira or any rich text editor.
+3. Follows `TICKET_CONFIG.md` when one exists.
+4. Shows the ticket in the chat as Markdown, ready to paste into your tracker or any rich text editor.
 5. Offers **Retry** and **Retry with edits** before it is final.
 
 - **Output:** ticket text in the chat.
@@ -77,7 +77,7 @@ Writes a clear Jira ticket from your answers or rough notes.
 Acts as the project's senior tech lead on a ticket. Read-only.
 
 1. Checks the ticket is ready: clear goal, testable acceptance criteria, gaps, questions to ask.
-2. Gives a verdict: **Ready**, **Needs small fixes** or **Not ready**. Checks against `JIRA_CONFIG.md` when one exists.
+2. Gives a verdict: **Ready**, **Needs small fixes** or **Not ready**. Checks against `TICKET_CONFIG.md` when one exists.
 3. Reads `PROJECT_CONTEXT.md` / `SYSTEM_CONTEXT.md` and scans the code.
 4. Shows a build plan:
    - the approach
@@ -184,7 +184,7 @@ Reviews code changes before they merge. Read-only by default.
 
 1. Reviews the current branch against its base branch (plus uncommitted work), or a named PR or branch.
 2. Reads every changed line for bugs, edge cases, security, performance, conventions and test gaps.
-3. Checks the acceptance criteria when the branch has a Jira key, plus the rules in `JIRA_CONFIG.md`.
+3. Checks the acceptance criteria when the branch has a Jira key, plus the rules in `TICKET_CONFIG.md`.
 4. Team agents from `create-team` each review the files in their own layer.
 5. Checks the change does not break other features:
    - `tech-lead` finds every caller, API consumer, other repo, database user and config that depends on the changed code.
@@ -238,13 +238,13 @@ Sets up an automatic agent that runs all of a repo's checks at a set time, like 
 
 - `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `analyze-ticket`, `implement-ticket` and `review-pr`. It learns the project from the context files and the business rules from the code, then works out which files change. For `review-pr` it runs an impact review: who depends on the changed code and what could break. When the repo has a team from `create-team`, it says which agent builds each part. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
 
-### How Jira configs combine
+### How ticket configs combine
 
 Settings are merged section by section (summary format, acceptance criteria style, and each ticket type's template). For each section the highest file that sets it wins:
 
-1. `JIRA_CONFIG.local.md` — your overrides for this repo
-2. `JIRA_CONFIG.md` — the team's rules for this repo
-3. `~/.claude/ai-sam/JIRA_CONFIG.md` — your defaults everywhere
+1. `TICKET_CONFIG.local.md` — your overrides for this repo
+2. `TICKET_CONFIG.md` — the team's rules for this repo
+3. `~/.claude/ai-sam/TICKET_CONFIG.md` — your defaults everywhere
 4. The built-in standard format
 
 So a local file with only `Acceptance criteria style: Gherkin` gives you Gherkin while you keep the team's summary tags and templates, and future team changes to those still apply to you.

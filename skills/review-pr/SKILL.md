@@ -1,6 +1,6 @@
 ---
 name: review-pr
-description: Review a set of code changes before they merge, as a senior reviewer — by default the current branch's changes (the diff against the base branch plus uncommitted work), or a pull request (PR) number, PR link or branch the user names. Reads every changed line for bugs, missing edge cases, security, performance, project conventions and test gaps, and checks the changes don't break other features — the tech-lead subagent finds every caller, API consumer, other repo, shared component, database user and config that depends on the changed code, and the skill runs the project's test, lint and build commands to prove it. Team agents from create-team each review the changed files in their own layer. Checks the ticket's acceptance criteria when the branch name has a Jira key, and the team rules in the ticket type's JIRA_CONFIG.md template from setup-jira-config. Works with GitHub, Azure DevOps and GitLab PRs; asks for the PR host once and saves it in PROJECT_CONTEXT.md. Shows a plain-English report with a Ready to merge / Merge after fixes / Not ready verdict and each finding ranked Blocker, Should fix or Nice to have, with file, line and a suggested fix. Saves each review outside the repo, so a re-run on the same branch marks each earlier finding Fixed or Still open and reviews the new commits in depth. Uses PROJECT_CONTEXT.md / SYSTEM_CONTEXT.md from create-project-context when present. Use when the user says "review my changes", "review this PR", "review PR 42", "is this ready to merge", "will this break anything", "check my branch before I raise a PR", or runs /ai-sam:review-pr [PR number, link or branch]. Read-only by default; never edits code, posts PR comments, commits or pushes without asking first.
+description: Review a set of code changes before they merge, as a senior reviewer — by default the current branch's changes (the diff against the base branch plus uncommitted work), or a pull request (PR) number, PR link or branch the user names. Reads every changed line for bugs, missing edge cases, security, performance, project conventions and test gaps, and checks the changes don't break other features — the tech-lead subagent finds every caller, API consumer, other repo, shared component, database user and config that depends on the changed code, and the skill runs the project's test, lint and build commands to prove it. Team agents from create-team each review the changed files in their own layer. Checks the ticket's acceptance criteria when the branch name has a Jira key, and the team rules in the ticket type's TICKET_CONFIG.md template from setup-ticket-config. Works with GitHub, Azure DevOps and GitLab PRs; asks for the PR host once and saves it in PROJECT_CONTEXT.md. Shows a plain-English report with a Ready to merge / Merge after fixes / Not ready verdict and each finding ranked Blocker, Should fix or Nice to have, with file, line and a suggested fix. Saves each review outside the repo, so a re-run on the same branch marks each earlier finding Fixed or Still open and reviews the new commits in depth. Uses PROJECT_CONTEXT.md / SYSTEM_CONTEXT.md from create-project-context when present. Use when the user says "review my changes", "review this PR", "review PR 42", "is this ready to merge", "will this break anything", "check my branch before I raise a PR", or runs /ai-sam:review-pr [PR number, link or branch]. Read-only by default; never edits code, posts PR comments, commits or pushes without asking first.
 ---
 
 # Review PR
@@ -131,16 +131,18 @@ Each review is saved (Step 8) to `~/.claude/ai-sam/reviews/<repo folder name>/<b
 
 1. Read the commit messages, and the PR title and description if there is one.
 2. **Ticket:** if the branch name, PR title or commits have a Jira key (e.g. `ABC-123`) and a Jira connector is available, fetch the ticket's summary, description and acceptance criteria. Say in one line that you fetched it. Without a connector, carry on from the commits; don't ask for the ticket.
-3. **Team ticket rules:** look for the config written by `/ai-sam:setup-jira-config`, in this order, and merge it section by section (the first file that sets a section wins):
-   1. `JIRA_CONFIG.local.md` in the repo root
-   2. `JIRA_CONFIG.md` in the repo root
-   3. `~/.claude/ai-sam/JIRA_CONFIG.md`
+3. **Team ticket rules:** look for the config written by `/ai-sam:setup-ticket-config`, in this order, and merge it section by section (the first file that sets a section wins):
+   1. `TICKET_CONFIG.local.md` in the repo root
+   2. `TICKET_CONFIG.md` in the repo root
+   3. `~/.claude/ai-sam/TICKET_CONFIG.md`
+
+   Older versions saved these as `JIRA_CONFIG.md` / `JIRA_CONFIG.local.md` (same paths, same format). If a `TICKET_CONFIG` file is missing but the old-named one exists, use the old one in its place.
 
    With a ticket, use what applies to its type:
    - **Acceptance criteria style is Gherkin** (Given / When / Then steps): each scenario is one acceptance criterion, and its Then lines say what the test must check.
    - **The type has a custom template:** each section that sets a rule for the work — e.g. "Definition of Done", "Regression risk", "Out of scope", "Security" — becomes a **team rule** to check. Use the ticket's text for that section, or the template's own text if the ticket left it empty. Skip sections that only describe the ticket, like "Context" or "Steps to reproduce".
 
-   Say in one line which file you used, or "No JIRA_CONFIG.md found". Skip this with no ticket.
+   Say in one line which file you used, or "No TICKET_CONFIG.md found". Skip this with no ticket.
 4. Write down, for yourself, the intent in 1–3 bullets. Every finding is judged against it.
 5. Check the ticket for personal or secret data (see the ground rules) before going on.
 
@@ -345,7 +347,7 @@ Show the report in the chat:
 | <short version> | Yes / No / Partly | `<file>` | `<test name>` / None |
 
 ### Team rules
-From `<JIRA_CONFIG file>`, <ticket type> template.
+From `<TICKET_CONFIG file>`, <ticket type> template.
 
 | Rule | Met? | Where |
 |---|---|---|

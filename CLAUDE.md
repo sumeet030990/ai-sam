@@ -4,7 +4,7 @@ Rules for writing or changing skills in this plugin.
 
 ## Every skill has an Output style section
 
-Each `skills/<name>/SKILL.md` must include this section, word for word, right after its **Ground rules**. Skills load on their own, so each one carries its own copy. `create-jira-ticket` covers the same rules in its **Writing style** section.
+Each `skills/<name>/SKILL.md` must include this section, word for word, right after its **Ground rules**. Skills load on their own, so each one carries its own copy. `create-ticket` covers the same rules in its **Writing style** section.
 
 ```markdown
 ## Output style

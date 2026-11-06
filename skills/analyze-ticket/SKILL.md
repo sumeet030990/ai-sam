@@ -1,6 +1,6 @@
 ---
 name: analyze-ticket
-description: Act as the project's senior tech lead on a Jira ticket (story, bug, task, epic or spike) — check whether it is ready for development and design how to build it, in one run. Gives a Ready / Needs small fixes / Not ready verdict with the gaps and the questions for the product owner, then a build plan — the approach, which existing files need updating, which new files are needed and where, which file delivers each acceptance criterion, tests, risks and open questions. Checks the ticket against the team's JIRA_CONFIG.md when one exists. Uses the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context and the tech-lead subagent, and still works from a code scan alone when no context file exists. Shows everything in the chat in short, plain English a junior developer or manager can follow. Use when the user says "analyze this ticket", "is this ticket ready", "review this story", "refine this ticket", "what's missing in this ticket", "grooming", "sprint planning check", "design a solution", "how should we build this ticket", "which files need to change", "what files do I need to create", "plan this story", "tech lead review of this ticket", or pastes a ticket and asks what's wrong with it or how to implement it. Read-only — does not write code, edit files or change Jira.
+description: Act as the project's senior tech lead on a Jira ticket (story, bug, task, epic or spike) — check whether it is ready for development and design how to build it, in one run. Gives a Ready / Needs small fixes / Not ready verdict with the gaps and the questions for the product owner, then a build plan — the approach, which existing files need updating, which new files are needed and where, which file delivers each acceptance criterion, tests, risks and open questions. Checks the ticket against the team's TICKET_CONFIG.md when one exists. Uses the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context and the tech-lead subagent, and still works from a code scan alone when no context file exists. Shows everything in the chat in short, plain English a junior developer or manager can follow. Use when the user says "analyze this ticket", "is this ticket ready", "review this story", "refine this ticket", "what's missing in this ticket", "grooming", "sprint planning check", "design a solution", "how should we build this ticket", "which files need to change", "what files do I need to create", "plan this story", "tech lead review of this ticket", or pastes a ticket and asks what's wrong with it or how to implement it. Read-only — does not write code, edit files or change Jira.
 ---
 
 # Analyze Ticket
@@ -10,7 +10,7 @@ Read a ticket, check it is clear and complete, then plan how to build it: which 
 ## Ground rules
 
 - **Read-only.** Don't write code, edit files, or change the Jira ticket (no edits, comments or status changes). If the user asks to save the report, do that only then (default path: `docs/design/<ticket key or short-name>.md`).
-- **Judge the ticket, don't rewrite it.** Point out gaps and suggest the fix in one line each. To rewrite the ticket, point the user to `/ai-sam:create-jira-ticket`.
+- **Judge the ticket, don't rewrite it.** Point out gaps and suggest the fix in one line each. To rewrite the ticket, point the user to `/ai-sam:create-ticket`.
 - **Ask only what the code can't answer.** Read the ticket and the code first. Ask the user only about gaps that change the design. Never invent requirements, numbers or names — put them under **Open questions**.
 - **Don't guess.** If you can't tell whether something is a gap (for example, a rule that may be documented elsewhere), list it as a question, not a gap.
 - **Every question uses AskUserQuestion**, never a plain-text question.
@@ -56,11 +56,13 @@ Check the ticket for personal or secret data (see the ground rules) before going
 
 ## Step 3 — Load the team's ticket rules
 
-Look for the team config written by `/ai-sam:setup-jira-config`, in this order, and merge it section by section (the first file that sets a section wins):
+Look for the team config written by `/ai-sam:setup-ticket-config`, in this order, and merge it section by section (the first file that sets a section wins):
 
-1. `JIRA_CONFIG.local.md` in the repo root
-2. `JIRA_CONFIG.md` in the repo root
-3. `~/.claude/ai-sam/JIRA_CONFIG.md`
+1. `TICKET_CONFIG.local.md` in the repo root
+2. `TICKET_CONFIG.md` in the repo root
+3. `~/.claude/ai-sam/TICKET_CONFIG.md`
+
+Older versions saved these as `JIRA_CONFIG.md` / `JIRA_CONFIG.local.md` (same paths, same format). If a `TICKET_CONFIG` file is missing but the old-named one exists, use the old one in its place.
 
 If one exists, check the ticket against its summary format, acceptance criteria style and the template for its type. If none exists, check against the standard sections for the ticket type (Step 4). Say in one line which you used.
 
@@ -142,7 +144,7 @@ Wait for its plan. A gap the code reveals (for example, the ticket names a scree
 - <question> — <who: product owner, designer, another team>
 
 ### Team format check
-- <only if a JIRA_CONFIG file was found: what doesn't match>
+- <only if a TICKET_CONFIG file was found: what doesn't match>
 
 <the tech-lead plan, starting at "## Solution design">
 ````
@@ -152,7 +154,7 @@ Wait for its plan. A gap the code reveals (for example, the ticket names a scree
    - **Retry** — ask the subagent for a fresh plan with a different approach, and say what to avoid from the last one.
    - **Retry with edits** — ask what to change (Simpler approach, Fewer files, More detail on one part, Less technical, or **Other**). Apply only that change — send design changes to the subagent — keep the rest, and show the result.
    - **Ask a follow-up** — answer the user's question about the report, reading the code again if needed.
-   - **Rewrite the ticket** — run `/ai-sam:create-jira-ticket` with the ticket and this report's gaps as the notes.
+   - **Rewrite the ticket** — run `/ai-sam:create-ticket` with the ticket and this report's gaps as the notes.
 
    Repeat until the user picks **Looks good**.
 4. Once the user picks **Looks good**, stop. In one line, mention what is available:

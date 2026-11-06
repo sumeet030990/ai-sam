@@ -1,11 +1,11 @@
 ---
-name: create-jira-ticket
-description: Interview the user and write a clear Jira ticket (story, bug, task, epic or spike) in plain, simple English with point-wise sections, using the standard format for its type or the team's own format saved in JIRA_CONFIG.md by setup-jira-config. Shows the finished ticket in the chat as Markdown that pastes cleanly into Jira or any rich text editor such as Confluence, Word, Google Docs or email. Use when the user says "create a Jira ticket", "write a ticket", "draft a story", "log a bug", "write up this task", "turn this into a ticket", or pastes rough notes and asks for a ticket. Does not save files or create the ticket in Jira.
+name: create-ticket
+description: Interview the user and write a clear ticket (story, bug, task, epic or spike) for any tracker — Jira, Bitbucket, Azure DevOps, GitHub, GitLab or similar — in plain, simple English with point-wise sections, using the standard format for its type or the team's own format saved in TICKET_CONFIG.md by setup-ticket-config. Shows the finished ticket in the chat as Markdown that pastes cleanly into the tracker or any rich text editor such as Confluence, Word, Google Docs or email. Use when the user says "create a ticket", "create a Jira ticket", "create a Bitbucket issue", "write a ticket", "draft a story", "log a bug", "write up this task", "turn this into a ticket", or pastes rough notes and asks for a ticket. Does not save files or create the ticket in the tracker.
 ---
 
-# Create Jira Ticket
+# Create Ticket
 
-Ask the user the questions that matter for the kind of ticket they want, then write the ticket in plain English, point by point, and show it in the chat ready to copy and paste into Jira or any rich text editor.
+Ask the user the questions that matter for the kind of ticket they want, then write the ticket in plain English, point by point, and show it in the chat ready to copy and paste into the team's tracker (Jira, Bitbucket, Azure DevOps, GitHub, GitLab or similar) or any rich text editor.
 
 ## Ground rules
 
@@ -46,17 +46,19 @@ Write as if explaining to a smart colleague who doesn't know the system. Apply t
 
 ## Step 0 — Load the team config
 
-Before the first question, look for saved team conventions (written by `/ai-sam:setup-jira-config`):
+Before the first question, look for saved team conventions (written by `/ai-sam:setup-ticket-config`):
 
-1. **Local file** — `JIRA_CONFIG.local.md` in the repo root (`git rev-parse --show-toplevel`; the current folder if it isn't a git repo). One person's overrides of the team rules.
-2. **Repo file** — `JIRA_CONFIG.md` in the repo root. The team's shared rules.
-3. **User file** — `~/.claude/ai-sam/JIRA_CONFIG.md`. Personal defaults across every repo.
+1. **Local file** — `TICKET_CONFIG.local.md` in the repo root (`git rev-parse --show-toplevel`; the current folder if it isn't a git repo). One person's overrides of the team rules.
+2. **Repo file** — `TICKET_CONFIG.md` in the repo root. The team's shared rules.
+3. **User file** — `~/.claude/ai-sam/TICKET_CONFIG.md`. Personal defaults across every repo.
+
+Older versions saved these as `JIRA_CONFIG.md` / `JIRA_CONFIG.local.md` (same paths, same format). If a `TICKET_CONFIG` file is missing but the old-named one exists, use the old one in its place.
 
 Merge them section by section: `Summary format`, `Acceptance criteria style`, and each type under `Templates` (`Story`, `Bug`, `Task`, `Epic`, `Spike`). For each section, use the first file in the order above that sets it, otherwise the standard behaviour in this skill. A section set to `Standard` means the standard behaviour.
 
-- If a file exists, say in one line which file(s) you're using. When the local file overrides the repo file, name the overridden sections, e.g. "Using JIRA_CONFIG.local.md (Acceptance criteria style) over JIRA_CONFIG.md". Don't ask about the settings — just follow them.
-- If none exists, carry on with the standard behaviour and mention once, in one line, that `/ai-sam:setup-jira-config` can save the team's summary format, acceptance criteria style and templates.
-- Don't edit the config files from this skill. If the user wants a setting changed, point them to `/ai-sam:setup-jira-config`.
+- If a file exists, say in one line which file(s) you're using. When the local file overrides the repo file, name the overridden sections, e.g. "Using TICKET_CONFIG.local.md (Acceptance criteria style) over TICKET_CONFIG.md". Don't ask about the settings — just follow them.
+- If none exists, carry on with the standard behaviour and mention once, in one line, that `/ai-sam:setup-ticket-config` can save the team's summary format, acceptance criteria style and templates.
+- Don't edit the config files from this skill. If the user wants a setting changed, point them to `/ai-sam:setup-ticket-config`.
 
 ## Step 1 — What kind of ticket
 
@@ -150,15 +152,15 @@ Ask one multi-select AskUserQuestion: "Do you want to add any of these?" — Pri
    - **Retry previous answer** — go back to a question from Step 2, update the answer, and redraft.
 
    Repeat until the user picks **Looks good**.
-3. Once the user picks **Looks good**, show the final ticket in the chat (see **Output format**) and stop. Don't ask any more questions — no saving to a file, copying to the clipboard, choosing a paste destination or creating it in Jira. If the user asks for one of these afterwards, do it then.
+3. Once the user picks **Looks good**, show the final ticket in the chat (see **Output format**) and stop. Don't ask any more questions — no saving to a file, copying to the clipboard, choosing a paste destination or creating it in the tracker. If the user asks for one of these afterwards, do it then.
 
 ## Output format
 
 Show the final ticket in the chat in this order:
 
-1. **Summary** on its own line, as plain text — it goes in Jira's separate Summary field.
-2. The description inside one fenced ```markdown block, so the user can copy the raw text in one go. Use `###` headings, `**bold**`, `-` bullets, `1.` numbered lists and `- [ ]` for acceptance criteria checklists. No tables (they paste less reliably). Jira Cloud and most rich text editors (Confluence, Teams, Google Docs with Markdown enabled) turn pasted Markdown into proper formatting.
-3. One short line: fields like Priority, Labels and Story points are set in Jira's side panel; they're listed in the description only for reference. Leave this line out if the ticket has none of them.
+1. **Summary** on its own line, as plain text — it goes in the tracker's separate title field (Summary in Jira, Title in Bitbucket, Azure DevOps, GitHub and GitLab).
+2. The description inside one fenced ```markdown block, so the user can copy the raw text in one go. Use `###` headings, `**bold**`, `-` bullets, `1.` numbered lists and `- [ ]` for acceptance criteria checklists. No tables (they paste less reliably). Jira Cloud, Bitbucket, Azure DevOps, GitHub, GitLab and most rich text editors (Confluence, Teams, Google Docs with Markdown enabled) turn pasted Markdown into proper formatting.
+3. One short line: fields like Priority, Labels and Story points are set in the tracker's own fields (e.g. Jira's side panel); they're listed in the description only for reference. Leave this line out if the ticket has none of them.
 
 If the user says they use Jira Server / Data Center, use Jira wiki markup instead (`h3. Heading`, `*bold*`, `* bullet`, `# numbered`, `{code}...{code}`, `[text|https://...]`) inside a fenced ```text block.
 

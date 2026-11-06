@@ -1,6 +1,6 @@
 ---
 name: write-test-cases
-description: Write manual test cases (step-by-step checks a tester follows by hand) for a ticket, feature, screen or endpoint, grouped as positive cases (valid input, the happy path works), negative cases (invalid input, wrong role, failures are handled) and edge cases (limits, empty values, boundaries, unusual timing), plus accessibility, security, browser and device, or performance cases when the user picks them. Works from a Jira or Azure DevOps ticket's acceptance criteria, pasted ticket text, a named feature, screen or endpoint, or, with nothing given, the changes on the current branch. Reads the code behind the feature to find the real rules — required fields, limits, roles, error messages — and maps every case to an acceptance criterion. Shows the cases for approval, then asks how to save them: a Markdown (.md) file, an Excel (.xlsx) file, or a comment on the ticket when Jira, Azure DevOps, GitHub or GitLab is connected — and, for Azure DevOps (Azure Test Plans) or Jira with Xray, asks whether to also create one linked test case item per case. Uses PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md from create-project-context when present. Use when the user says "write test cases", "create test cases for ABC-123", "give me positive and negative test cases", "QA test cases for the checkout page", "edge cases for POST /orders", "test case sheet", or runs /ai-sam:write-test-cases [ticket key, feature, screen or endpoint]. Writes no test code, never edits source code, and never posts to a ticket or creates items without showing them first.
+description: Write manual test cases (step-by-step checks a tester follows by hand) for a ticket, feature, screen or endpoint, grouped as positive cases (valid input, the happy path works), negative cases (invalid input, wrong role, failures are handled) and edge cases (limits, empty values, boundaries, unusual timing), plus accessibility, security, browser and device, or performance cases when the user picks them. Works from a Jira or Azure DevOps ticket's acceptance criteria, pasted ticket text, a named feature, screen or endpoint, or, with nothing given, the changes on the current branch. Reads the code behind the feature to find the real rules — required fields, limits, roles, error messages — and maps every case to an acceptance criterion. Shows the cases for approval, then asks how to save them: a Markdown (.md) file, an Excel (.xlsx) file, or a comment on the ticket when Jira, Azure DevOps, GitHub or GitLab is connected — and, for Azure DevOps (Azure Test Plans) or Jira with Xray, asks whether to also create one linked test case item per case — or a shared location such as SharePoint, OneDrive, Google Drive or Confluence, whose details are asked once and saved in PROJECT_CONTEXT.md so later runs just offer it. Uses PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md from create-project-context when present. Use when the user says "write test cases", "create test cases for ABC-123", "give me positive and negative test cases", "QA test cases for the checkout page", "edge cases for POST /orders", "test case sheet", or runs /ai-sam:write-test-cases [ticket key, feature, screen or endpoint]. Writes no test code, never edits source code, and never posts to a ticket or creates items without showing them first.
 ---
 
 # Write Test Cases
@@ -18,7 +18,7 @@ Pick one of three targets:
 - **A feature, screen or endpoint** — e.g. `/ai-sam:write-test-cases checkout page` or `/ai-sam:write-test-cases POST /orders`.
 - **Branch changes** — the feature changed on the current branch. Used when no target is given.
 
-The user sees the cases before anything is saved, then picks where they go: a `.md` file, an `.xlsx` file, a comment on the ticket, or test case items linked to the ticket (Azure Test Plans, or Jira with Xray).
+The user sees the cases before anything is saved, then picks where they go: a `.md` file, an `.xlsx` file, a comment on the ticket, test case items linked to the ticket (Azure Test Plans, or Jira with Xray), or a shared location such as SharePoint (set up once, then offered every time).
 
 Where it fits:
 
@@ -28,7 +28,7 @@ Where it fits:
 
 ## Ground rules
 
-- **Test cases only.** Write no test code. Never edit source code, tests or config. The one exception: add the save folder to `.gitignore` (Step 7).
+- **Test cases only.** Write no test code. Never edit source code, tests or config. The only exceptions: add the save folder to `.gitignore` (Step 7), and save the shared location line in `PROJECT_CONTEXT.md` or `CLAUDE.md` (Step 6c).
 - **Show first, then save.** Never write a file or post a comment before the user approves the cases in Step 5 and picks a save option in Step 6.
 - **Grounded in the code.** Take limits, required fields, roles and error messages from the code when it is available. Never invent a rule. If the expected result is unclear, add it to **Questions**.
 - **Every case is testable.** One clear action and one expected result a tester can check on screen or in the API response. No "works correctly" or "behaves as expected".
@@ -242,6 +242,8 @@ Find the ticket systems this session can post to. Offer only the ones that work:
 
 Bitbucket repos usually track tickets in Jira — use the Jira row. Don't post to a Bitbucket pull request. Other Jira test tools (e.g. Zephyr) can't be reached through the connector — offer a comment only.
 
+Then look for a saved **shared location** (a team folder outside the repo, e.g. SharePoint): the `**Test cases share:**` line in `PROJECT_CONTEXT.md` (repo root or `docs/`), else in the repo's `CLAUDE.md`. Note it for 6b.
+
 ### 6b — Ask
 
 Ask — **How should I save these test cases?** (multi-select, so the user can pick more than one):
@@ -249,9 +251,14 @@ Ask — **How should I save these test cases?** (multi-select, so the user can p
 - **Markdown file (.md)** — (Recommended when no ticket system is connected) save to `docs/test-cases/<ticket key or feature>-test-cases.md`.
 - **Excel file (.xlsx)** — one sheet per group (Positive, Negative, Edge and any extra groups) plus a Coverage sheet, at `docs/test-cases/<ticket key or feature>-test-cases.xlsx`.
 - **Post on ticket `<key>` in <Jira / Azure DevOps / GitHub / GitLab>** — (Recommended when a ticket is connected) only if 6a found the system and a ticket key is known. With a system connected but no key, offer **Post on a ticket I name in Other**.
+- **Shared location** — one of:
+  - **Save to <service> — `<folder>`** — when 6a found a saved shared location. (Recommended when one is saved.)
+  - **Save to SharePoint or another service** — when none is saved. Sets it up once in 6c.
 - **Retry previous answer**.
 
-Say the user can type a different folder or file name in **Other**. If the folder doesn't exist, say it will be created and added to `.gitignore`. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+The question has room for 4 options. If there are more, keep **Retry previous answer** and the Recommended ones, and fold the rest into one option (e.g. **Markdown or Excel file in the repo**, then ask which in a follow-up).
+
+Say the user can type a different folder or file name in **Other**, or "change shared location" to set up 6c again. If the folder doesn't exist, say it will be created and added to `.gitignore`. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
 
 **If the user picked Post on ticket** and 6a found test case items for that system, ask — **How should I post to `<key>`?**:
 
@@ -261,6 +268,32 @@ Say the user can type a different folder or file name in **Other**. If the folde
 - **Retry previous answer**.
 
 With no test case items for that system, skip this question and add a comment.
+
+### 6c — Set up the shared location (first time only)
+
+Run only when the user picked **Save to SharePoint or another service**, or typed "change shared location". Never ask for or save passwords, tokens, client secrets or any other credential — only where the file goes.
+
+1. Ask — **Where should test cases be shared?**: SharePoint (Recommended), OneDrive, Google Drive, Confluence, Retry previous answer. Say the user can type another service in **Other**.
+2. Ask for the details that service needs, in one call. Suggest values from the repo name and ticket project where you can:
+
+   | Service | Details to ask |
+   |---|---|
+   | SharePoint | Site URL (e.g. `https://<company>.sharepoint.com/sites/<team>`), document library (default `Documents`), folder path (e.g. `QA/Test Cases/<project>`) |
+   | OneDrive | Folder path (e.g. `Test Cases/<project>`) |
+   | Google Drive | Folder link or folder path, and shared drive name if any |
+   | Confluence | Space key and parent page title |
+   | Other | Folder link or path, and how files get there (a connector, a command-line tool, or by hand) |
+
+3. Ask — **File format for the shared copy**: Excel (.xlsx) (Recommended), Markdown (.md), Retry previous answer. Leave this out for Confluence — it gets a page.
+4. Ask — **Sub-folder per ticket?**: No, all files in one folder (Recommended), Yes — one sub-folder per ticket key, Retry previous answer.
+5. **Save the answers** so later runs don't ask. Add one line to the **Overview** section of `PROJECT_CONTEXT.md`, and a dated row to its **Change log**:
+
+   ```markdown
+   - **Test cases share:** SharePoint — site `<site URL>` — library `<library>` — folder `<folder path>` — format .xlsx — sub-folder per ticket: no
+   ```
+
+   Use the same pattern for other services, with that service's details. With no `PROJECT_CONTEXT.md`, add the line under a `## Test cases` heading in the repo's `CLAUDE.md`. Say in one line where it was saved, and that teammates share it once the file is committed.
+6. Go on to Step 7 with this location picked.
 
 ## Step 7 — Save
 
@@ -312,6 +345,20 @@ Write the Step 5 output as the file, with a first line `# Test cases: <ticket ke
    - **Jira (Xray)** — create a **Test** issue in the ticket's project with the steps, test data and expected result in the description. Link it to the ticket with the **Test** link type if the project has one, else **Relates**. Use the issue type and link names the connector returns; don't guess them.
 4. If one item fails, stop, show the error in one line, list what was created so far, and ask: Retry the rest (Recommended), Stop here, Retry previous answer. Don't delete what was created.
 
+### 7e — Save to the shared location
+
+Done after 7a–7d, using the `**Test cases share:**` line.
+
+1. **Build the file** in the saved format, as in 7a or 7b. If the user didn't also pick a repo file, build it in a temporary folder outside the repo and delete it after upload. For Confluence, build the page body from the Step 5 output.
+2. **Find a way to upload**, in this order:
+   - A connector for that service in this session (e.g. Microsoft 365 or SharePoint for SharePoint and OneDrive, Google Drive, Atlassian for Confluence).
+   - SharePoint or OneDrive: the CLI for Microsoft 365 (`m365`), if `m365 status` shows it is signed in — `m365 spo file add --webUrl <site URL> --folder "<library>/<folder path>" --path <file>`.
+   - Neither: say in one line that no upload tool is connected, and which connector would make it work. Save the file to the repo folder as in 7-0 and 7a or 7b, and give the exact place to upload it by hand (site, library, folder).
+3. **Check for a file or page with the same name** in that folder. If one exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+4. Show the file name and the full destination (service, site, folder). Ask — **Upload to <service>?**: Upload (Recommended), Change the folder for this file only, Retry previous answer. Upload only on yes.
+5. Give the link to the uploaded file or page. If the upload fails, show the error in one line, save the file in the repo folder instead, and say so.
+6. If the saved location no longer exists or access is denied, say so and offer to set it up again (6c).
+
 ## Step 8 — Report
 
 Show a short report in the chat:
@@ -325,9 +372,10 @@ Show a short report in the chat:
 - `<path>.xlsx`
 - Comment on `<key>` — <link>
 - <n> test case items linked to `<key>` — <IDs or links>
+- <SharePoint / other service> — <link to the file or page>
 
 **Open questions:** <n> — listed in the file / None
 **Next step:** `/ai-sam:write-feature-tests <key>` to automate the High priority cases.
 ````
 
-Leave out lines that don't apply. Add a line if `.gitignore` was created or changed — that change is uncommitted. Never commit or push anything.
+Leave out lines that don't apply. Add a line if `.gitignore`, `PROJECT_CONTEXT.md` or `CLAUDE.md` was created or changed — those changes are uncommitted. Never commit or push anything.

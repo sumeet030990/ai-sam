@@ -60,6 +60,8 @@ Merge them section by section: `Summary format`, `Acceptance criteria style`, an
 - If none exists, carry on with the standard behaviour and mention once, in one line, that `/ai-sam:setup-ticket-config` can save the team's summary format, acceptance criteria style and templates.
 - Don't edit the config files from this skill. If the user wants a setting changed, point them to `/ai-sam:setup-ticket-config`.
 
+Also read the `## Delivery and release process` section of `PROJECT_CONTEXT.md` (repo root or `docs/`) or `SYSTEM_CONTEXT.md`, if present. It is written by `/ai-sam:setup-release-process` and used only for the **Target release** field below. Don't mention it when it's missing.
+
 ## Step 1 — What kind of ticket
 
 If the user pasted notes or gave a description with the request, read it first and use it to suggest answers.
@@ -141,7 +143,15 @@ One scenario per behaviour. Each **Then** is a single yes-or-no check.
 
 ### Optional fields — ask once
 
-Ask one multi-select AskUserQuestion: "Do you want to add any of these?" — Priority, Labels / components, Story points / estimate, Links (related tickets, designs, documents), Dependencies or blockers, Technical notes. Then ask only about the ones picked. Leave the rest out of the ticket entirely (don't write empty headings).
+Ask one AskUserQuestion call with two multi-select questions (each question takes at most 4 options): "Do you want to add any of these?" — Priority, Labels / components, Story points / estimate, Target release / sprint; and "Any of these?" — Links (related tickets, designs, documents), Dependencies or blockers, Technical notes. Then ask only about the ones picked. Leave the rest out of the ticket entirely (don't write empty headings).
+
+**Target release / sprint** — with a release section from Step 0, suggest up to 3 options:
+
+- **The next release whose code freeze hasn't started** (Recommended) — e.g. "2.5.0 — freeze Tue 8 Dec, release Tue 15 Dec". Use the Jira fix versions and sprints when the section says so and Jira is connected; otherwise work the dates out from the rules. With several release trains, use the train the ticket's area belongs to.
+- **The release after that** — for large work that won't fit before the freeze.
+- **Hotfix** — offer only for a Highest or High priority bug, if the section has a hotfix process.
+
+Without a release section, offer the unreleased Jira fix versions or open sprints if Jira is connected, else let the user type it. Put the answer in the ticket's details as `Target release: <name>`; the user sets the tracker's own Fix version or Sprint field.
 
 ## Step 3 — Draft, review, and finish
 

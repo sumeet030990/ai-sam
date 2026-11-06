@@ -53,6 +53,7 @@ Check the ticket for personal or secret data (see the ground rules) before going
 2. Look for `PROJECT_CONTEXT.md` in the repo root or `docs/`, and `SYSTEM_CONTEXT.md` in the parent folder or at the path its **System** section names.
 3. **In a parent folder with several repos:** read `SYSTEM_CONTEXT.md` (or list the subfolders that are git repos) and work out which repos the ticket touches. If it isn't clear, ask — **Repos**: the likely repos (Recommended), All repos, Retry previous answer.
 4. **No context file:** say in one line "No PROJECT_CONTEXT.md found — the plan will be based on a code scan only." and carry on. Don't stop to ask.
+5. **Release rules.** If a context file has a `## Delivery and release process` section (from `/ai-sam:setup-release-process`), find the ticket's target release (its fix version or sprint, else the next release whose code freeze hasn't started). Get the release date from Jira when the section says so, else from its rules, and count back to the code freeze. Use this for the report's **Target release** line in Step 7.
 
 ## Step 3 — Load the team's ticket rules
 
@@ -131,6 +132,7 @@ Wait for its plan. A gap the code reveals (for example, the ticket names a scree
 **Verdict:** Ready / Needs small fixes / Not ready — <one-line reason>
 **Size:** Small / Medium / Large — <one-line reason, from the plan>
 **Based on:** <context files read> | Code scan only
+**Target release:** <2.5.0 — code freeze Tue 8 Dec (12 working days left), release Tue 15 Dec. Fits / Tight / Won't fit before freeze — <one-line reason from the plan's size>. Leave out when there is no release section.>
 
 ### What's clear
 - <point>

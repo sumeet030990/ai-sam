@@ -29,7 +29,7 @@ For multi-repo projects the order is: **run in each repo first, then run in the 
   - The user types their own answer through the built-in **Other** textbox. Mention this in the question text, e.g. "…or type your own in Other".
   - Group up to 4 related questions in one AskUserQuestion call rather than asking them one at a time.
 - Always let the user correct a wrong answer. Every AskUserQuestion you ask in this skill includes a **Retry previous answer** option as its last option (it takes one of the 4 option slots, so show at most 3 other choices). If the user picks it, ask which earlier answer they want to change (default: the one just before this question), re-ask that question, update the recorded answer, and then return to the question you were on. The first question of a run has nothing to retry, so leave the option out there. When the user types their own answer in **Other**, repeat back what you recorded in the next question so they can correct it. A user can also say "retry" or "go back" at any point to do the same.
-- If a `PROJECT_CONTEXT.md` (or, in parent mode, `SYSTEM_CONTEXT.md`) already exists, read it first, show the user what it holds, and ask whether to update it or replace it. Default to updating — keep sections the user does not change, and keep the existing change log rows.
+- If a `PROJECT_CONTEXT.md` (or, in parent mode, `SYSTEM_CONTEXT.md`) already exists, read it first, show the user what it holds, and ask whether to update it or replace it. Default to updating — keep sections the user does not change, and keep the existing change log rows. Always keep a `## Delivery and release process` section as it is; `/ai-sam:setup-release-process` owns it. If the file has none, mention in the final summary that this skill can add one.
 - When updating, check for drift before asking anything else. In repo mode: confirm every listed manifest file still exists, re-read the runtime and key framework versions and compare them with the **Tech stack** table, and check the listed commands still exist in their source files. In parent mode: confirm each component path and context file still exists, and look for new or removed components. Show the user what changed, update those rows after they confirm, and name the drift fixes in the change log row.
 
 ## Output style
@@ -300,6 +300,8 @@ When writing or changing code for this project:
 ## Conventions
 
 <Coding style, linting, folder structure, branching — or remove this section.>
+
+<## Delivery and release process — written by /ai-sam:setup-release-process. Keep it as it is when present; never add it here.>
 
 ## Notes
 

@@ -112,6 +112,10 @@ Remember the system — Steps 4, 7 and 8 use it.
 1. Read, if present:
    - `PROJECT_CONTEXT.md` in the repo root or `docs/` — product goal, main user flows, user roles.
    - `SYSTEM_CONTEXT.md` in the parent folder — which repos and services connect, so a change in one can break another.
+   - The `## Delivery and release process` section in either file (from `/ai-sam:setup-release-process`). Use it to fill the report's **Dates** line:
+     - the release date — from the Jira fix version or sprint when the section says so and Jira is connected, else from its **Releases** rules (for several release trains, the train this release belongs to);
+     - the code freeze, **All tickets tested**, **Regression testing** and **UAT sign-off** dates, counted back with its **Code freeze and deadlines** rules;
+     - working days left until the "all tickets tested" date, counted from today.
    - `CLAUDE.md` in the repo root.
 2. Load `TEST_SCOPE_CONFIG.md`. Settings merge section by section; for each section the highest file that sets it wins:
 
@@ -250,6 +254,7 @@ Show it in the chat:
 
 **Source:** <Jira fix version / Azure DevOps iteration / Active sprint / Branch range `<from>..<to>`>
 **Rules:** <config files loaded, or "Built-in rules">
+**Dates:** <code freeze Tue 8 Dec · regression 9–11 Dec · all tickets tested by Fri 11 Dec (4 working days left) · UAT sign-off Mon 14 Dec · release Tue 15 Dec — from Jira fix version / from release rules. Leave out when there is no release section.>
 **Summary:** <n> tickets — <n> smoke, <n> regression (includes smoke), <n> skip. <n> not in this build.
 **Gaps:** <n> smoke or high-risk tickets with no automated test.
 

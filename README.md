@@ -8,12 +8,13 @@ Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for 
 
 | Step | Stage | Skills |
 | --- | --- | --- |
-| 1 | Set up (once per repo or team) | `create-project-context`, `setup-ticket-config`, `create-team` |
+| 1 | Set up (once per repo or team) | `create-project-context`, `setup-release-process`, `setup-ticket-config`, `create-team` |
 | 2 | Write and check the ticket | `create-ticket`, `analyze-ticket` |
 | 3 | Build | `implement-ticket` |
 | 4 | Test | `write-unit-tests`, `write-feature-tests`, `write-test-cases`, `run-test-report` |
 | 5 | Review | `review-pr` |
 | 6 | Release and schedule | `smoke-regression-report`, `schedule-tests` |
+| 7 | Track the sprint (daily, for project managers) | `pm-daily-brief` |
 
 All skills write in short, point-wise, plain English, so a junior developer or a manager can follow the results.
 
@@ -30,7 +31,30 @@ Teaches Claude your project, so later skills write code that fits it.
 - **Output:** `PROJECT_CONTEXT.md` or `SYSTEM_CONTEXT.md`.
 - **Used by:** `analyze-ticket`, `implement-ticket`, `review-pr`, the test skills.
 
-#### 1.2 `/ai-sam:setup-ticket-config`
+#### 1.2 `/ai-sam:setup-release-process`
+
+Saves how the project plans, tests and ships work, once.
+
+1. When Jira is connected, reads recent sprints and fix versions (read-only) to suggest the answers.
+2. Asks for the delivery method: sprint-based (Scrum), Kanban, waterfall or hybrid, and the sprint length.
+3. For sprint teams, asks when each ceremony happens: planning, stand-up, refinement, review / demo, retrospective.
+4. Asks whether there is one release schedule or several (release trains, for example web monthly and mobile every two weeks).
+5. Asks for the release types (major, minor, hotfix), version format and release dates, for example "15th of every month".
+6. Asks for the environments (Dev, QA, UAT, Staging, Production), the branching model, and which branch deploys where.
+7. Asks how and when each environment is deployed, and who deploys to Production.
+8. Asks for the code freeze (how many days before release), the "all tickets tested by" and UAT sign-off deadlines, and the hotfix process.
+9. Asks for the release checklist: go/no-go meeting, release-day steps, checks after release, and who is told.
+10. Works out the next real release dates from the answers (or Jira), so you can check the rules are right.
+
+- **Output:** a **Delivery and release process** section in `PROJECT_CONTEXT.md`, or in `SYSTEM_CONTEXT.md` when several repos release together. It saves rules, not dates. Real dates come from Jira fix versions when connected, else from the rules.
+- **Used by:**
+  - `implement-ticket` — starts the branch from the right base branch with the right name, and warns when code freeze is close.
+  - `review-pr` — checks the target branch, and flags a merge after code freeze that the freeze rule doesn't allow.
+  - `analyze-ticket` — shows the target release and whether the work fits before code freeze.
+  - `create-ticket` — suggests the target release or sprint.
+  - `smoke-regression-report` — shows the freeze, testing and release dates, and the working days left.
+
+#### 1.3 `/ai-sam:setup-ticket-config`
 
 Saves how your team writes tickets, once. Works for any tracker: Jira, Bitbucket, Azure DevOps, GitHub, GitLab and others.
 
@@ -45,7 +69,7 @@ Saves how your team writes tickets, once. Works for any tracker: Jira, Bitbucket
 - **Output:** a `TICKET_CONFIG` file. See [How ticket configs combine](#how-ticket-configs-combine).
 - **Used by:** `create-ticket`, `analyze-ticket`, `review-pr`.
 
-#### 1.3 `/ai-sam:create-team`
+#### 1.4 `/ai-sam:create-team`
 
 Creates builder subagents (helper agents), one per layer of the repo.
 
@@ -233,6 +257,50 @@ Sets up an automatic agent that runs all of a repo's checks at a set time, like 
 
 - **Never** runs against production or stores secret values.
 - **Never** commits, pushes or creates a pipeline without asking.
+
+### Step 7 — Track the sprint (daily)
+
+#### 7.1 `/ai-sam:pm-daily-brief [sprint, board or team]`
+
+Gives the project manager (PM) a short morning brief for the active sprint, from Jira or Azure DevOps. Written for the PM and leadership.
+
+**For the PM and leadership** (tickets only, no people's names):
+
+1. **Leadership summary:** 3 to 5 bullets — the verdict, top risks and decisions needed.
+2. **Sprint health:** On track, At risk or Off track, with the numbers:
+   - work done against time used
+   - forecast finish against the sprint end
+   - scope added after the sprint started
+   - progress on the sprint goal
+3. **Epics and releases:** percent done, forecast finish and risk for each epic and fix version, against its target date. Uses the code freeze date from `setup-release-process` when present.
+4. **Bugs:** new this sprint by priority, open high-priority bugs, reopened bugs, bugs found after a story was done, and opened vs closed.
+5. **Since last brief:** what finished, new and cleared flags, status changes, and tickets flagged several days in a row. Uses a small daily snapshot saved in `~/.claude/ai-sam/pm-brief/`.
+
+**PM only:**
+
+6. **Team status:** one row per person — load against capacity, work done, tickets in progress, and **On track**, **Watch** or **Needs a check-in** with the reason.
+7. **Ask today:** each ticket that needs a check-in, with the reason and a ready-to-ask, neutral question. Flags tickets that are:
+   - stuck in one status too long, past due, or due soon and not started
+   - over their estimate, or with no update for days
+   - blocked, sent back from QA or review, or carried over from an earlier sprint
+   - in progress with no branch or PR, or with a PR waiting for review
+   - unassigned or not estimated, or a high-priority or reopened bug
+8. **PR review load:** PRs waiting on each reviewer, the oldest wait, and PRs with no reviewer. Works with GitHub, Azure Repos and GitLab.
+
+**How it runs:**
+
+- Uses the team's rules (members, capacity, days off, done statuses, check-in limits, bug priorities), set up on the first run and saved in `PM_BRIEF_CONFIG.md` (team, `.local` for you in one repo, or `~/.claude/ai-sam/` for you everywhere).
+- Shows the brief for approval. You can change a limit for today or save it.
+- Asks where to save or send it, and which version each place gets: the **leadership version** (no PM-only section) or the **full brief**. Places:
+  - chat only
+  - Markdown or Excel in `docs/pm-brief/` (added to `.gitignore`)
+  - SharePoint, OneDrive, Google Drive, or a dated Confluence page
+  - a Microsoft Teams channel, a Slack channel, or email
+- The first answer is saved in `PM_BRIEF_CONFIG.md`. Email recipients are saved only in your personal config.
+- Run it every weekday morning with `/schedule` or `/loop`. Scheduled runs save files only; uploads and messages wait for your approval.
+
+- Flags describe the work, never the person. No ranking of people.
+- **Never** comments on, moves or reassigns a ticket or PR, and never messages a team member. Shows the exact message before anything is uploaded, posted or sent.
 
 ## Subagents
 

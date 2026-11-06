@@ -72,6 +72,10 @@ If something blocks, ask — **Ticket gaps**: Answer the gaps now (Recommended),
    - `SYSTEM_CONTEXT.md` in the parent folder or at the path its **System** section names.
    - `CLAUDE.md` in the repo root, including any **Team** section (between `<!-- ai-sam:team:start -->` and `<!-- ai-sam:team:end -->`).
 3. Note the install, test, lint and build commands. With no context file, take them from the manifest scripts, `Makefile` or README, and say in one line "No PROJECT_CONTEXT.md found — using commands from `<file>`."
+4. **Release rules.** If a context file has a `## Delivery and release process` section (from `/ai-sam:setup-release-process`), follow its **Rules for future work**:
+   - Note the **Main working branch**, the **Feature branches** and **Hotfix branches** naming, and, with several release trains, which train this ticket belongs to.
+   - Find the ticket's release (its fix version or sprint). Get the release date from Jira when the section says so, else from the rules, and count back to the code freeze.
+   - If the freeze has started, or starts within 2 working days, say so in one line, e.g. "Code freeze for 2.5.0 starts Tue 8 Dec, 6:00 PM — 1 working day left." Don't stop; the user decides.
 
 ## Step 4 — Get an approved plan
 
@@ -102,11 +106,12 @@ Never stash, reset or discard the user's changes yourself.
 
 **Not on the ticket's branch** — ask with AskUserQuestion:
 
-1. Find the suggested branch name: `<ticket key>-<2–4 word summary>`, lower case with hyphens, e.g. `abc-123-upload-documents`. If the repo has a naming pattern (in `PROJECT_CONTEXT.md` **Conventions** or `git branch -a`), follow it, e.g. `feature/ABC-123-upload-documents`.
+1. Find the suggested branch name: `<ticket key>-<2–4 word summary>`, lower case with hyphens, e.g. `abc-123-upload-documents`. If the repo has a naming pattern, follow it, e.g. `feature/ABC-123-upload-documents`. Look first at the release section's **Feature branches** (or **Hotfix branches** for a hotfix), then `PROJECT_CONTEXT.md` **Conventions**, then `git branch -a`.
+   - **Start branch:** the release section's **Main working branch**, or the hotfix start branch for a hotfix. With no release section, use the current branch.
 2. Check for a local or remote branch that already has the ticket key (`git branch -a --list "*<key>*"`, without case).
 3. Ask — **Where should I work?** Say in the question that the user can type a new branch name in **Other**. Options, in this order:
    - **Switch to `<existing branch>`** (Recommended) — only if step 2 found one. It replaces the next option.
-   - **Create a branch `<suggested name>`** (Recommended) — from the current branch. Only when step 2 found nothing.
+   - **Create a branch `<suggested name>`** (Recommended) — from the start branch in step 1; name it in the description. Only when step 2 found nothing.
    - **Create a worktree** (a second folder with its own branch, so the current folder is left as it is) — at `../<repo folder>-<ticket key>`, on the existing ticket branch if found, else on a new branch `<suggested name>`.
    - **Work on the current branch `<branch>`** — on `main`, `master` or `develop`, add to the description: "Not recommended — changes go straight onto a shared branch."
    - **Retry previous answer.**
@@ -115,8 +120,8 @@ Never stash, reset or discard the user's changes yourself.
 | Choice | Commands | If there are uncommitted changes |
 |---|---|---|
 | Switch to existing branch | `git switch <branch>` | Ask first — Stop so I can commit or stash them (Recommended), Carry them over, Retry previous answer. If git refuses, stop and tell the user. |
-| Create a branch (or a name typed in **Other**) | `git switch -c <name>` | Same question as above. |
-| Create a worktree | New branch: `git worktree add ../<repo folder>-<ticket key> -b <name>`. Existing branch: `git worktree add ../<repo folder>-<ticket key> <branch>` | Leave them where they are. Tell the user they stay in the current folder and are not in the worktree. |
+| Create a branch (or a name typed in **Other**) | `git switch -c <name> <start branch>` | Same question as above. |
+| Create a worktree | New branch: `git worktree add ../<repo folder>-<ticket key> -b <name> <start branch>`. Existing branch: `git worktree add ../<repo folder>-<ticket key> <branch>` | Leave them where they are. Tell the user they stay in the current folder and are not in the worktree. |
 | Current branch | none | Carry on; they become part of this ticket's work. Say so. |
 
 **Worktree:** do every later step inside the worktree folder. Give team agents the worktree path as the repo root. Install dependencies there first with the install command from Step 3, since a new worktree has none.

@@ -67,7 +67,8 @@ Then, in every mode, check for an earlier review (1D).
 ### 1A — Current changes
 
 1. Find the base branch (the branch this one was made from):
-   - `git rev-parse --abbrev-ref origin/HEAD`, else the first of `main`, `master`, `develop` that exists.
+   - the **Main working branch** in the context file's `## Delivery and release process` section (the **Hotfix branches** start branch for a `hotfix/*` branch), when set;
+   - else `git rev-parse --abbrev-ref origin/HEAD`, else the first of `main`, `master`, `develop` that exists.
    - On the base branch itself, there is no branch diff. Review uncommitted changes only, and say so.
 2. Collect:
    - committed changes: `git diff <base branch>...HEAD`
@@ -123,6 +124,7 @@ Each review is saved (Step 8) to `~/.claude/ai-sam/reviews/<repo folder name>/<b
 1. Read, if present:
    - `PROJECT_CONTEXT.md` in the repo root or `docs/` — versions, commands, conventions.
    - `SYSTEM_CONTEXT.md` in the parent folder or at the path its **System** section names — the other repos and how they connect.
+   - The `## Delivery and release process` section in either file (from `/ai-sam:setup-release-process`) — branches, code freeze and hotfix rules, used in Step 5.
    - `CLAUDE.md` in the repo root, including any **Team** section (between `<!-- ai-sam:team:start -->` and `<!-- ai-sam:team:end -->`).
    - Lint and format configs (`.eslintrc*`, `.editorconfig`, `.prettierrc*`, `stylecop.json`, `ruff.toml` and the like) — the repo's rules beat general taste.
 2. Note the test, lint, build and type-check commands. With no context file, take them from the manifest scripts (`package.json`, `*.csproj`, `pyproject.toml`, `pom.xml`, `build.gradle`), `Makefile` or README, and say in one line "No PROJECT_CONTEXT.md found — using commands from `<file>`."
@@ -246,6 +248,11 @@ Read every changed line in context — open the whole function or component, not
    - tests check behaviour, not internals, and don't use real network, clock or random values
    - existing tests weren't deleted, skipped or weakened without a reason
 8. **Leftovers:** debug logs, commented-out code, `TODO`s without a ticket, unused imports, new packages nobody asked for.
+9. **Release rules** (only when a `## Delivery and release process` section exists; follow its **Rules for future work**):
+   - **Target branch** — a feature branch targets the **Main working branch**; a hotfix targets the **Production branch** and lists the merge-back branches. Wrong target → **Should fix**.
+   - **Branch name** — matches the **Feature branches** or **Hotfix branches** pattern. A mismatch → **Nice to have**.
+   - **Code freeze** — when the target is a release branch (or the ticket's release is past its freeze date), work out the freeze date for that release (Jira first when the section says so). After freeze, a change the freeze rule doesn't allow is a **Blocker** unless the PR or ticket says it was approved by the role the section names. Quote the rule and the freeze date in the finding.
+   - **Hotfix** — the version change and merge-back branches the **Hotfixes** sub-section asks for are mentioned in the PR or planned. Missing → **Should fix**.
 
 Write each problem as a draft finding with file, line, what goes wrong and when.
 

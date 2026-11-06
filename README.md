@@ -4,22 +4,235 @@ End to end workflow skills for any projects you work on, packaged as a Claude Co
 
 ## Skills
 
-- `/ai-sam:create-project-context` — interviews you about a repo (goals, stack, dependency manifests, commands) and writes a `PROJECT_CONTEXT.md` that later coding sessions read before writing code. In a parent folder it writes a `SYSTEM_CONTEXT.md` that maps the repos and how they connect.
-- `/ai-sam:create-jira-ticket` — asks the questions a story, bug, task, epic or spike needs, then writes the ticket in plain, point-wise English using the standard format for that type. Shows the finished ticket in the chat as Markdown, ready to paste into Jira or any rich text editor, with Retry and Retry with edits options before it is final. Follows the team's `JIRA_CONFIG.md` when one exists.
-- `/ai-sam:setup-jira-config` — asks once how your team writes tickets (summary format such as `[FE]` tags or a custom pattern, checklist or Gherkin acceptance criteria, and custom templates that fully replace the standard Story, Bug, Task, Epic or Spike formats) and saves it in a `JIRA_CONFIG.md`. Save it for the team per repo (`JIRA_CONFIG.md` in the repo root, shareable by committing it), for yourself across all repos (`~/.claude/ai-sam/JIRA_CONFIG.md`), or for yourself in one repo (`JIRA_CONFIG.local.md` in the repo root, gitignored) to override the team's rules without changing them for anyone else.
+Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for every ticket or release.
 
-- `/ai-sam:analyze-ticket` — acts as the project's senior tech lead on a ticket (a Jira key or pasted text). First checks it is ready to start: clear goal, testable acceptance criteria, gaps and questions to ask, with a Ready / Needs small fixes / Not ready verdict, checked against `JIRA_CONFIG.md` when one exists. Then reads `PROJECT_CONTEXT.md` / `SYSTEM_CONTEXT.md`, scans the code, and shows a plan: the approach, which files to update, which new files to create and where, which file delivers each acceptance criterion, tests, risks and open questions. Works from a code scan alone when no context file exists. Read-only.
-- `/ai-sam:implement-ticket` — builds a ticket end to end. Reuses or makes a plan with `tech-lead`, and waits for your approval before writing code. If you're already on the ticket's branch it works there; otherwise it asks whether to create a branch, create a worktree or use the current branch. Then it writes the code and a test for every acceptance criterion, runs the project's test, lint and build commands, and shows a report of what changed. Checks for a builder agent that owns each part (from `create-team`, `.claude/agents/` or `~/.claude/agents/`) and hands it the ticket, plan, branch and rules in one brief; builds the rest itself. Never commits, pushes, opens a PR or changes Jira without asking.
-- `/ai-sam:write-unit-tests [file]` — writes or updates unit tests for a whole existing file, frontend (component, hook, service) or backend (controller, service, repository, handler), or, with no file given, for the code changed on the current branch (against the base branch, plus uncommitted work). Checks for existing tests first: keeps the ones that still fit, updates outdated ones, removes ones for code that no longer exists, adds the missing cases, and creates a test file only when none exists. Detects the test framework, mocking library and file layout from the repo (Jest, Vitest, xUnit, NUnit, pytest, JUnit and more) and copies the closest existing test. Shows a test plan (main path, edge cases, errors, each branch) for approval, then writes the tests, runs them and reports coverage for the changed files. If a test finds a real bug, it shows the bug and a proposed fix and edits source code only on a yes. Hands the work to a QA agent from `create-team` when one exists. Never commits, pushes or adds packages without asking.
-- `/ai-sam:write-feature-tests [ticket, feature or endpoint]` — writes or updates feature tests that check a whole feature works end to end: browser E2E tests for the frontend (Playwright, Cypress and more) and API or integration tests for the backend (WebApplicationFactory, Testcontainers, Supertest, TestClient, Spring Boot Test and more). Works from a Jira ticket's acceptance criteria, a named screen or endpoint, or, with nothing given, the changes on the current branch. Checks existing feature tests first and reuses the repo's page objects, login and test data setup. Shows a Given / When / Then plan mapped to each acceptance criterion for approval, writes the tests, asks before starting any app or container, runs them and reports which acceptance criteria pass. Uses `.feature` files only if the repo already uses Gherkin. Never runs against production, and never commits, pushes or adds packages without asking.
-- `/ai-sam:write-test-cases [ticket, feature or endpoint]` — writes manual test cases (step-by-step checks a tester follows by hand) in three groups: positive (the happy path works), negative (bad input, wrong role and failures are blocked with a clear message) and edge cases (limits, empty values, boundaries, timing), only where they apply. Asks whether to add accessibility, security, browser and device, or performance cases. Works from a Jira or Azure DevOps ticket's acceptance criteria, a named screen or endpoint, or, with nothing given, the changes on the current branch, and reads the code for the real required fields, limits, roles and error messages. Shows the cases with a coverage table per acceptance criterion for approval, then asks how to save them: a Markdown file, an Excel file (one sheet per group, with Status and Notes columns for the tester) — both in `docs/test-cases/`, which it creates if missing and adds to `.gitignore` — or a comment on the ticket when Jira, Azure DevOps, GitHub or GitLab is connected. For Azure DevOps (Azure Test Plans) or Jira with Xray, it asks whether to comment, create one linked test case item per case, or both. It can also upload to a shared location (SharePoint, OneDrive, Google Drive or Confluence): it asks for the site and folder once, saves them as a **Test cases share** line in `PROJECT_CONTEXT.md`, and offers that location on every later run. Writes no test code, and never posts to a ticket or creates items without showing them first.
-- `/ai-sam:smoke-regression-report [release, sprint or branch range]` — sorts every ticket in a release into Smoke (a short check that the build works), Regression (a deeper check that existing features still work; includes smoke) or Skip (docs, test-only or build-file changes). Takes tickets from a Jira fix version or Azure DevOps iteration, the active sprint, or the ticket keys in commits between two branches or tags. Scores each ticket's risk from its code changes: critical area, shared code, database or login changes, priority, change size, recent bug fixes and missing tests. Applies the team's rules (critical areas, always-smoke and always-skip rules, score limits, smoke list limit), set up on the first run and saved in `TEST_SCOPE_CONFIG.md` (team, `.local` for one person in one repo, or `~/.claude/ai-sam/` for one person everywhere). For each ticket shows the reason, the screens and endpoints to check, and the tests that already cover it, with gaps flagged. Shows the report for approval and lets you move a ticket or save the move as a team rule. Then asks where to save: Markdown or Excel in `docs/test-scope/` (added to `.gitignore`), SharePoint, OneDrive, Google Drive, a Confluence page, or smoke / regression labels on the tickets. The first answer is saved in `TEST_SCOPE_CONFIG.md` and offered first on later runs. Never labels, uploads or posts without showing it first.
-- `/ai-sam:run-test-report [unit | feature | all] [filter]` — runs the repo's test suites now and reports the results: unit tests and feature tests (browser E2E and API or integration tests), for the frontend, the backend, or both. Finds the test commands from `PROJECT_CONTEXT.md`, manifest scripts, test config or CI files, and shows a run plan (exact commands, what it starts, rough time) for approval. Asks before starting any app, server or container, and never runs against production. Reports totals per suite, every failing test with its file, first error line and likely cause (app bug, test problem, environment or flaky), slow tests, and coverage when a coverage command exists. Can re-run failures on the base branch to split new failures from ones already failing. Then asks where to save: Markdown or Excel in `docs/test-runs/` (added to `.gitignore`), SharePoint, OneDrive, Google Drive, a Confluence page, or a comment on the branch's Jira ticket. The first answer is saved in `PROJECT_CONTEXT.md` and offered first on later runs. Never fixes, skips or changes a test or source file, and never uploads or posts without showing it first.
-- `/ai-sam:schedule-tests [run | list | remove]` — sets up an automatic agent that runs all of a repo's checks at a set time, like a cron job: lint, type-check, build, unit tests and feature (E2E) tests. Asks each time where to run it: a scheduled CI pipeline (GitHub Actions, Azure DevOps or GitLab), your own machine (launchd on macOS, cron on Linux, Task Scheduler on Windows, running Claude Code headless), or a Claude Code cloud routine. Then asks when (days, time, time zone) and which checks to include. Runs on the latest base branch in a separate worktree, so your open work is never touched. Saves a dated pass/fail report after every run, listing each failing test with its file and first error line, in `~/.claude/ai-sam/scheduled-tests/<repo>/reports/` (as a build artifact for CI, or in the run's transcript for a cloud routine). `run` runs everything now, and `list` / `remove` show, change or delete schedules. Never runs against production, never stores secret values, and never commits, pushes or creates a pipeline without asking.
-- `/ai-sam:review-pr [PR number, link or branch]` — reviews code changes before they merge: by default the current branch against its base branch plus uncommitted work, or a named PR or branch. Reads every changed line for bugs, edge cases, security, performance, conventions and test gaps, and checks the acceptance criteria when the branch has a Jira key, plus the team rules in the ticket type's `JIRA_CONFIG.md` template. Team agents from `create-team` each review the files in their own layer. Checks the change doesn't break other features: `tech-lead` finds every caller, API consumer, other repo, database user and config that depends on the changed code, and the skill runs the project's type-check, lint, build and test commands (in a temporary worktree for another branch, after asking). Works with GitHub, Azure DevOps and GitLab PRs; asks for the PR host once and saves it in `PROJECT_CONTEXT.md`. Shows a Ready to merge / Merge after fixes / Not ready verdict with each finding ranked Blocker, Should fix or Nice to have, with file, line and a fix. Saves each review in `~/.claude/ai-sam/reviews/`, so a re-run on the same branch marks earlier findings Fixed or Still open. Read-only by default; fixes code or posts PR comments only after you approve the exact change or text.
-- `/ai-sam:create-team` — scans the repo you're in and suggests one builder subagent per layer (Frontend, Backend, Database, API, DevOps, QA test automation and more), each backed by the files that justify it. Writes the ones you pick to `.claude/agents/` (shared with the team when committed) or `~/.claude/agents/` (only you), and lists them in a **Team** section of the repo's `CLAUDE.md`. Each agent knows the folders it owns, the patterns to copy, the commands to run and what it must not touch. `tech-lead` then names which agent builds each part of a plan.
+| Step | Stage | Skills |
+| --- | --- | --- |
+| 1 | Set up (once per repo or team) | `create-project-context`, `setup-jira-config`, `create-team` |
+| 2 | Write and check the ticket | `create-jira-ticket`, `analyze-ticket` |
+| 3 | Build | `implement-ticket` |
+| 4 | Test | `write-unit-tests`, `write-feature-tests`, `write-test-cases`, `run-test-report` |
+| 5 | Review | `review-pr` |
+| 6 | Release and schedule | `smoke-regression-report`, `schedule-tests` |
 
 All skills write in short, point-wise, plain English, so a junior developer or a manager can follow the results.
+
+### Step 1 — Set up (run once)
+
+#### 1.1 `/ai-sam:create-project-context`
+
+Teaches Claude your project, so later skills write code that fits it.
+
+1. Asks about the repo: goals, tech stack, dependency manifests (for example `package.json`) and the install, run, test, lint and build commands.
+2. Writes `PROJECT_CONTEXT.md` in the repo root.
+3. In a parent folder of several repos, writes `SYSTEM_CONTEXT.md` that maps the repos and how they connect. See [Project context for multi-repo projects](#project-context-for-multi-repo-projects).
+
+- **Output:** `PROJECT_CONTEXT.md` or `SYSTEM_CONTEXT.md`.
+- **Used by:** `analyze-ticket`, `implement-ticket`, `review-pr`, the test skills.
+
+#### 1.2 `/ai-sam:setup-jira-config`
+
+Saves how your team writes Jira tickets, once.
+
+1. Asks for the summary format (for example `[FE]` tags or a custom pattern).
+2. Asks for the acceptance criteria style: checklist or Gherkin (Given / When / Then).
+3. Asks for any custom templates that fully replace the standard Story, Bug, Task, Epic or Spike formats.
+4. Asks where to save it:
+   - **Team, this repo:** `JIRA_CONFIG.md` in the repo root. Share it by committing it.
+   - **Just you, all repos:** `~/.claude/ai-sam/JIRA_CONFIG.md`.
+   - **Just you, this repo:** `JIRA_CONFIG.local.md` in the repo root (gitignored). Overrides the team's rules for you only.
+
+- **Output:** a `JIRA_CONFIG` file. See [How Jira configs combine](#how-jira-configs-combine).
+- **Used by:** `create-jira-ticket`, `analyze-ticket`, `review-pr`.
+
+#### 1.3 `/ai-sam:create-team`
+
+Creates builder subagents (helper agents), one per layer of the repo.
+
+1. Scans the repo and suggests one agent per layer: Frontend, Backend, Database, API, DevOps, QA test automation and more.
+2. Shows the files that justify each agent.
+3. Writes the agents you pick to `.claude/agents/` (shared when committed) or `~/.claude/agents/` (only you).
+4. Lists them in a **Team** section of the repo's `CLAUDE.md`.
+5. Each agent knows its folders, the patterns to copy, the commands to run and what it must not touch.
+
+- **Output:** agent files and a **Team** section in `CLAUDE.md`.
+- **Used by:** `tech-lead`, `implement-ticket`, `write-unit-tests`, `review-pr`.
+
+### Step 2 — Write and check the ticket
+
+#### 2.1 `/ai-sam:create-jira-ticket`
+
+Writes a clear Jira ticket from your answers or rough notes.
+
+1. Asks the questions a story, bug, task, epic or spike needs.
+2. Writes the ticket in plain, point-wise English, in the standard format for that type.
+3. Follows `JIRA_CONFIG.md` when one exists.
+4. Shows the ticket in the chat as Markdown, ready to paste into Jira or any rich text editor.
+5. Offers **Retry** and **Retry with edits** before it is final.
+
+- **Output:** ticket text in the chat.
+
+#### 2.2 `/ai-sam:analyze-ticket [Jira key or pasted text]`
+
+Acts as the project's senior tech lead on a ticket. Read-only.
+
+1. Checks the ticket is ready: clear goal, testable acceptance criteria, gaps, questions to ask.
+2. Gives a verdict: **Ready**, **Needs small fixes** or **Not ready**. Checks against `JIRA_CONFIG.md` when one exists.
+3. Reads `PROJECT_CONTEXT.md` / `SYSTEM_CONTEXT.md` and scans the code.
+4. Shows a build plan:
+   - the approach
+   - files to update and new files to create (and where)
+   - which file delivers each acceptance criterion
+   - tests, risks and open questions
+5. Works from a code scan alone when no context file exists.
+
+- **Output:** readiness verdict and build plan in the chat.
+
+### Step 3 — Build
+
+#### 3.1 `/ai-sam:implement-ticket`
+
+Builds a ticket end to end.
+
+1. Reuses the plan from `analyze-ticket`, or makes one with `tech-lead`.
+2. Waits for your approval before writing code.
+3. Works on the ticket's branch if you are on it. Otherwise asks: create a branch, create a worktree (a second working folder for the same repo) or use the current branch.
+4. Hands each part to its builder agent (from `create-team`, `.claude/agents/` or `~/.claude/agents/`) with the ticket, plan, branch and rules. Builds the rest itself.
+5. Writes the code and a test for every acceptance criterion.
+6. Runs the project's test, lint and build commands.
+7. Shows a report of what changed.
+
+- **Never** commits, pushes, opens a PR or changes Jira without asking.
+
+### Step 4 — Test
+
+#### 4.1 `/ai-sam:write-unit-tests [file]`
+
+Writes or updates unit tests (tests for one function, class or component on its own).
+
+1. Targets a whole file you name, or, with no file, the code changed on the current branch (plus uncommitted work).
+2. Covers frontend (component, hook, service) and backend (controller, service, repository, handler) code.
+3. Checks existing tests first: keeps the ones that fit, updates outdated ones, removes ones for deleted code, adds missing cases.
+4. Creates a test file only when none exists.
+5. Detects the framework, mocking library and file layout (Jest, Vitest, xUnit, NUnit, pytest, JUnit and more) and copies the closest existing test.
+6. Shows a test plan (main path, edge cases, errors, each branch) for approval.
+7. Writes the tests, runs them and reports coverage for the changed files.
+8. If a test finds a real bug, shows it with a proposed fix. Edits source code only on a yes.
+9. Hands the work to a QA agent from `create-team` when one exists.
+
+- **Never** commits, pushes or adds packages without asking.
+
+#### 4.2 `/ai-sam:write-feature-tests [ticket, feature or endpoint]`
+
+Writes or updates feature tests that check a whole feature works end to end.
+
+1. **Frontend:** browser E2E (end-to-end) tests with Playwright, Cypress and more.
+2. **Backend:** API or integration tests with WebApplicationFactory, Testcontainers, Supertest, TestClient, Spring Boot Test and more.
+3. Works from a Jira ticket's acceptance criteria, a named screen or endpoint, or the current branch's changes.
+4. Checks existing feature tests first and reuses the repo's page objects, login and test data setup.
+5. Shows a Given / When / Then plan, mapped to each acceptance criterion, for approval.
+6. Asks before starting any app or container, then runs the tests.
+7. Reports which acceptance criteria pass.
+8. Uses `.feature` files only if the repo already uses Gherkin.
+
+- **Never** runs against production. Never commits, pushes or adds packages without asking.
+
+#### 4.3 `/ai-sam:write-test-cases [ticket, feature or endpoint]`
+
+Writes manual test cases (step-by-step checks a tester follows by hand). Writes no test code.
+
+1. Works from a Jira or Azure DevOps ticket, a named screen or endpoint, or the current branch's changes.
+2. Reads the code for the real required fields, limits, roles and error messages.
+3. Groups cases, only where they apply:
+   - **Positive:** the happy path works.
+   - **Negative:** bad input, wrong role and failures are blocked with a clear message.
+   - **Edge:** limits, empty values, boundaries, timing.
+4. Asks whether to add accessibility, security, browser and device, or performance cases.
+5. Shows the cases with a coverage table per acceptance criterion for approval.
+6. Asks how to save them:
+   - Markdown or Excel (one sheet per group, with Status and Notes columns) in `docs/test-cases/`. Creates the folder and adds it to `.gitignore`.
+   - A comment on the ticket (Jira, Azure DevOps, GitHub or GitLab).
+   - For Azure Test Plans or Jira with Xray: a comment, one linked test case item per case, or both.
+   - A shared location (SharePoint, OneDrive, Google Drive or Confluence). Saved once as a **Test cases share** line in `PROJECT_CONTEXT.md` and offered on later runs.
+
+- **Never** posts to a ticket or creates items without showing them first.
+
+#### 4.4 `/ai-sam:run-test-report [unit | feature | all] [filter]`
+
+Runs the repo's test suites now and reports the results.
+
+1. Covers unit tests and feature tests, for the frontend, the backend, or both.
+2. Finds the test commands from `PROJECT_CONTEXT.md`, manifest scripts, test config or CI files.
+3. Shows a run plan (exact commands, what it starts, rough time) for approval.
+4. Asks before starting any app, server or container.
+5. Reports:
+   - totals per suite
+   - every failing test with its file, first error line and likely cause (app bug, test problem, environment or flaky)
+   - slow tests
+   - coverage, when a coverage command exists
+6. Can re-run failures on the base branch to split new failures from ones already failing.
+7. Asks where to save: Markdown or Excel in `docs/test-runs/` (added to `.gitignore`), SharePoint, OneDrive, Google Drive, Confluence, or a comment on the branch's Jira ticket. The first answer is saved in `PROJECT_CONTEXT.md`.
+
+- **Never** runs against production, and never fixes, skips or changes a test or source file.
+- **Never** uploads or posts without showing it first.
+
+### Step 5 — Review
+
+#### 5.1 `/ai-sam:review-pr [PR number, link or branch]`
+
+Reviews code changes before they merge. Read-only by default.
+
+1. Reviews the current branch against its base branch (plus uncommitted work), or a named PR or branch.
+2. Reads every changed line for bugs, edge cases, security, performance, conventions and test gaps.
+3. Checks the acceptance criteria when the branch has a Jira key, plus the rules in `JIRA_CONFIG.md`.
+4. Team agents from `create-team` each review the files in their own layer.
+5. Checks the change does not break other features:
+   - `tech-lead` finds every caller, API consumer, other repo, database user and config that depends on the changed code.
+   - Runs the project's type-check, lint, build and test commands (in a temporary worktree for another branch, after asking).
+6. Works with GitHub, Azure DevOps and GitLab PRs. Asks for the PR host once and saves it in `PROJECT_CONTEXT.md`.
+7. Gives a verdict: **Ready to merge**, **Merge after fixes** or **Not ready**.
+8. Ranks each finding **Blocker**, **Should fix** or **Nice to have**, with file, line and a fix.
+9. Saves each review in `~/.claude/ai-sam/reviews/`. A re-run on the same branch marks earlier findings **Fixed** or **Still open**.
+
+- Fixes code or posts PR comments only after you approve the exact change or text.
+
+### Step 6 — Release and schedule
+
+#### 6.1 `/ai-sam:smoke-regression-report [release, sprint or branch range]`
+
+Sorts every ticket in a release by how much testing it needs.
+
+1. Takes tickets from a Jira fix version, an Azure DevOps iteration, the active sprint, or the ticket keys in commits between two branches or tags.
+2. Sorts each ticket into:
+   - **Smoke:** a short check that the build works.
+   - **Regression:** a deeper check that existing features still work (includes smoke).
+   - **Skip:** docs, test-only or build-file changes.
+3. Scores risk from the code changes: critical area, shared code, database or login changes, priority, change size, recent bug fixes, missing tests.
+4. Applies the team's rules (critical areas, always-smoke and always-skip rules, score limits, smoke list limit). Set up on the first run and saved in `TEST_SCOPE_CONFIG.md` (team, `.local` for you in one repo, or `~/.claude/ai-sam/` for you everywhere).
+5. For each ticket shows the reason, the screens and endpoints to check, and the tests that already cover it. Flags gaps.
+6. Shows the report for approval. You can move a ticket or save the move as a team rule.
+7. Asks where to save: Markdown or Excel in `docs/test-scope/` (added to `.gitignore`), SharePoint, OneDrive, Google Drive, Confluence, or smoke / regression labels on the tickets. The first answer is saved in `TEST_SCOPE_CONFIG.md`.
+
+- **Never** labels, uploads or posts without showing it first.
+
+#### 6.2 `/ai-sam:schedule-tests [run | list | remove]`
+
+Sets up an automatic agent that runs all of a repo's checks at a set time, like a cron job (a timed task).
+
+1. Asks where to run it:
+   - a scheduled CI pipeline (GitHub Actions, Azure DevOps or GitLab)
+   - your own machine (launchd on macOS, cron on Linux, Task Scheduler on Windows, running Claude Code headless)
+   - a Claude Code cloud routine
+2. Asks when (days, time, time zone) and which checks: lint, type-check, build, unit tests, feature (E2E) tests.
+3. Runs on the latest base branch in a separate worktree, so your open work is never touched.
+4. Saves a dated pass/fail report after every run, listing each failing test with its file and first error line. Reports go to `~/.claude/ai-sam/scheduled-tests/<repo>/reports/` (a build artifact for CI, or the run's transcript for a cloud routine).
+5. Commands:
+   - `run` — runs everything now.
+   - `list` — shows and changes schedules.
+   - `remove` — deletes a schedule.
+
+- **Never** runs against production or stores secret values.
+- **Never** commits, pushes or creates a pipeline without asking.
 
 ## Subagents
 

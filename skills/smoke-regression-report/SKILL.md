@@ -21,7 +21,7 @@ The team's rules live in `TEST_SCOPE_CONFIG.md`. The first run sets them up; lat
 
 Where it fits:
 
-1. `/ai-sam:write-test-cases` — manual test cases for one ticket.
+1. `/ai-sam:write-qa-test-cases` — manual test cases for one ticket.
 2. `/ai-sam:smoke-regression-report` — which tickets in a release go in smoke and which in regression. (This skill.)
 3. `/ai-sam:write-feature-tests` — automated tests for a whole feature.
 
@@ -240,8 +240,8 @@ For each Smoke and Regression ticket:
 2. **Existing tests** — look for each, and name the file or item found:
    - Feature (E2E — end to end) tests: Playwright, Cypress or API test files that open the same route or call the same endpoint.
    - Test case items linked to the ticket: Azure Test Plans (**Tested By** links) or Jira Xray **Test** issues.
-   - Manual test cases from `/ai-sam:write-test-cases` in `docs/test-cases/<key>-test-cases.md` or `.xlsx`.
-3. **Gap** — mark **Gap** when a Smoke or High-risk ticket has no automated test for its main area. Suggest `/ai-sam:write-feature-tests <key>` or `/ai-sam:write-test-cases <key>`.
+   - Manual test cases from `/ai-sam:write-qa-test-cases` in `docs/test-cases/<key>-test-cases.md` or `.xlsx`.
+3. **Gap** — mark **Gap** when a Smoke or High-risk ticket has no automated test for its main area. Suggest `/ai-sam:write-feature-tests <key>` or `/ai-sam:write-qa-test-cases <key>`.
 
 Don't open or run the tests. Searching for file names and routes is enough.
 
@@ -322,7 +322,7 @@ Say the user can type another place in **Other**. Then ask the follow-ups, in on
 | Any shared folder | **File type for the shared copy**: Excel (.xlsx) (Recommended), Markdown (.md) |
 | Labels | **Label names**: `smoke-test` and `regression-test` (Recommended), or type others in **Other** |
 
-If `PROJECT_CONTEXT.md` has a `**Test cases share:**` line from `/ai-sam:write-test-cases`, offer that location as the first suggestion.
+If `PROJECT_CONTEXT.md` has a `**Test cases share:**` line from `/ai-sam:write-qa-test-cases`, offer that location as the first suggestion.
 
 Never ask for or save passwords, tokens or any other credential — only where the file goes.
 

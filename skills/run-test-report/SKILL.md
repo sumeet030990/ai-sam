@@ -255,7 +255,7 @@ Say the user can type another place in **Other**. Then ask the follow-ups, in on
 | Any shared folder | **File type for the shared copy**: Excel (.xlsx) (Recommended), Markdown (.md) |
 | Jira comment | **Which ticket?**: `<key from branch>` (Recommended), or type another key in **Other** |
 
-If `PROJECT_CONTEXT.md` has a `**Test cases share:**` line from `/ai-sam:write-test-cases`, offer that location as the first suggestion for a shared folder.
+If `PROJECT_CONTEXT.md` has a `**Test cases share:**` line from `/ai-sam:write-qa-test-cases`, offer that location as the first suggestion for a shared folder.
 
 Never ask for or save passwords, tokens or any other credential — only where the file goes.
 

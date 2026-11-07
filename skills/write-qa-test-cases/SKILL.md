@@ -1,6 +1,6 @@
 ---
-name: write-test-cases
-description: Write manual test cases (step-by-step checks a tester follows by hand) for a ticket, feature, screen or endpoint, grouped as positive cases (valid input, the happy path works), negative cases (invalid input, wrong role, failures are handled) and edge cases (limits, empty values, boundaries, unusual timing), plus accessibility, security, browser and device, or performance cases when the user picks them. Works from a Jira or Azure DevOps ticket's acceptance criteria, pasted ticket text, a named feature, screen or endpoint, or, with nothing given, the changes on the current branch. Reads the code behind the feature to find the real rules — required fields, limits, roles, error messages — and maps every case to an acceptance criterion. Shows the cases for approval, then asks how to save them: a Markdown (.md) file, an Excel (.xlsx) file, or a comment on the ticket when Jira, Azure DevOps, GitHub or GitLab is connected — and, for Azure DevOps (Azure Test Plans) or Jira with Xray, asks whether to also create one linked test case item per case — or a shared location such as SharePoint, OneDrive, Google Drive or Confluence, whose details are asked once and saved in PROJECT_CONTEXT.md so later runs just offer it. Uses PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md from create-project-context when present. Use when the user says "write test cases", "create test cases for ABC-123", "give me positive and negative test cases", "QA test cases for the checkout page", "edge cases for POST /orders", "test case sheet", or runs /ai-sam:write-test-cases [ticket key, feature, screen or endpoint]. Writes no test code, never edits source code, and never posts to a ticket or creates items without showing them first.
+name: write-qa-test-cases
+description: Write manual test cases (step-by-step checks a tester follows by hand) for a ticket, feature, screen or endpoint, grouped as positive cases (valid input, the happy path works), negative cases (invalid input, wrong role, failures are handled) and edge cases (limits, empty values, boundaries, unusual timing), plus accessibility, security, browser and device, or performance cases when the user picks them. Works from a Jira or Azure DevOps ticket's acceptance criteria, pasted ticket text, a named feature, screen or endpoint, or, with nothing given, the changes on the current branch. Reads the code behind the feature to find the real rules — required fields, limits, roles, error messages — and maps every case to an acceptance criterion. Shows the cases for approval, then asks how to save them: a Markdown (.md) file, an Excel (.xlsx) file, or a comment on the ticket when Jira, Azure DevOps, GitHub or GitLab is connected — and, for Azure DevOps (Azure Test Plans) or Jira with Xray, asks whether to also create one linked test case item per case — or a shared location such as SharePoint, OneDrive, Google Drive or Confluence, whose details are asked once and saved in PROJECT_CONTEXT.md so later runs just offer it. Uses PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md from create-project-context when present. Use when the user says "write test cases", "create test cases for ABC-123", "give me positive and negative test cases", "QA test cases for the checkout page", "edge cases for POST /orders", "test case sheet", or runs /ai-sam:write-qa-test-cases [ticket key, feature, screen or endpoint]. Writes no test code, never edits source code, and never posts to a ticket or creates items without showing them first.
 ---
 
 # Write Test Cases
@@ -14,15 +14,15 @@ Write manual test cases (step-by-step checks a tester follows by hand) in three 
 
 Pick one of three targets:
 
-- **A ticket** — a Jira or Azure DevOps key, or pasted ticket text, e.g. `/ai-sam:write-test-cases ABC-123`. Every case maps to an acceptance criterion.
-- **A feature, screen or endpoint** — e.g. `/ai-sam:write-test-cases checkout page` or `/ai-sam:write-test-cases POST /orders`.
+- **A ticket** — a Jira or Azure DevOps key, or pasted ticket text, e.g. `/ai-sam:write-qa-test-cases ABC-123`. Every case maps to an acceptance criterion.
+- **A feature, screen or endpoint** — e.g. `/ai-sam:write-qa-test-cases checkout page` or `/ai-sam:write-qa-test-cases POST /orders`.
 - **Branch changes** — the feature changed on the current branch. Used when no target is given.
 
 The user sees the cases before anything is saved, then picks where they go: a `.md` file, an `.xlsx` file, a comment on the ticket, test case items linked to the ticket (Azure Test Plans, or Jira with Xray), or a shared location such as SharePoint (set up once, then offered every time).
 
 Where it fits:
 
-1. `/ai-sam:write-test-cases` — test cases a person runs by hand. (This skill.)
+1. `/ai-sam:write-qa-test-cases` — test cases a person runs by hand. (This skill.)
 2. `/ai-sam:write-unit-tests` — automated tests for one function or class.
 3. `/ai-sam:write-feature-tests` — automated tests for a whole feature, through the UI or the API.
 
@@ -306,7 +306,7 @@ Only when a `.md` or `.xlsx` file was picked:
 1. **Create the folder** if it doesn't exist (`mkdir -p <folder>`, default `docs/test-cases/`), including any missing parent folders.
 2. **Keep it out of git** (the files are working notes, not code):
    - Check with `git check-ignore -q <folder>/x.md`. If it is already ignored, do nothing.
-   - Otherwise add the folder, relative to the repo root with a trailing slash (e.g. `docs/test-cases/`), on its own line at the end of the repo root `.gitignore`, under a `# Test cases from ai-sam write-test-cases` comment. Create `.gitignore` if there is none. Don't change any other line.
+   - Otherwise add the folder, relative to the repo root with a trailing slash (e.g. `docs/test-cases/`), on its own line at the end of the repo root `.gitignore`, under a `# Test cases from ai-sam write-qa-test-cases` comment. Create `.gitignore` if there is none. Don't change any other line.
    - If files in the folder are already tracked by git (`git ls-files <folder>` lists any), `.gitignore` won't hide them. Say so in one line, and don't untrack them.
    - Not in a git repo: skip this.
 3. Say in one line what was created and added, e.g. "Created `docs/test-cases/` and added it to `.gitignore`."

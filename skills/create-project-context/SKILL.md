@@ -233,7 +233,7 @@ _Last updated: <YYYY-MM-DD> by <name of the person who provided the details, or 
 - **Stage:** <New / In development / In production>
 - **Repository:** <URL, or Not applicable / To be decided if the user confirmed so>
 - **PR host:** <GitHub / Azure DevOps / GitLab / Bitbucket — remove this line if not known; review-pr asks for it and adds it>
-- **Test cases share:** <service — site, library, folder, format — remove this line if not known; write-test-cases asks for it and adds it>
+- **Test cases share:** <service — site, library, folder, format — remove this line if not known; write-qa-test-cases asks for it and adds it>
 - **Project root:** <path>
 
 ## System

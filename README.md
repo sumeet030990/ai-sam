@@ -11,7 +11,7 @@ Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for 
 | 1 | Set up (once per repo or team) | `create-project-context`, `setup-release-process`, `setup-ticket-config`, `create-team` |
 | 2 | Write and check the ticket | `create-ticket`, `analyze-ticket` |
 | 3 | Build | `implement-ticket` |
-| 4 | Test | `write-unit-tests`, `write-feature-tests`, `write-test-cases`, `run-test-report` |
+| 4 | Test | `write-unit-tests`, `write-feature-tests`, `write-qa-test-cases`, `run-test-report` |
 | 5 | Review | `review-pr` |
 | 6 | Release and schedule | `smoke-regression-report`, `schedule-tests` |
 | 7 | Track the sprint (daily, for project managers) | `pm-daily-brief` |
@@ -161,7 +161,7 @@ Writes or updates feature tests that check a whole feature works end to end.
 
 - **Never** runs against production. Never commits, pushes or adds packages without asking.
 
-#### 4.3 `/ai-sam:write-test-cases [ticket, feature or endpoint]`
+#### 4.3 `/ai-sam:write-qa-test-cases [ticket, feature or endpoint]`
 
 Writes manual test cases (step-by-step checks a tester follows by hand). Writes no test code.
 

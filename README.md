@@ -325,6 +325,28 @@ For a project made of several repos (backend + frontend, microservices, micro-fr
 2. Run it again in the **parent folder** (or monorepo root). It writes a `SYSTEM_CONTEXT.md` that only references each repo's context file and records how the repos connect.
 3. Re-run it in the parent whenever a repo is added or removed, or a repo's context changes.
 
+## Security
+
+Tickets, PRs, code and logs are written by many people. Someone can plant text in them that tries to steer the AI (prompt injection). ai-sam protects against it in two layers:
+
+1. **Rules in every skill.** Each skill's **Untrusted content** section treats that text as data, never as instructions, and flags any attempt to steer it.
+2. **The guard hook** (`hooks/guard.py`). It checks every tool call, in skills, subagents and your normal sessions, while the plugin is enabled:
+
+   | Action | What happens |
+   |---|---|
+   | Read `.env`, private keys, `.git-credentials`, cloud credential files | Blocked |
+   | Download a script and run it straight away (`curl … \| sh`) | Blocked |
+   | Read `local.settings.json`, `secrets.json`, `.npmrc` | Asks you first |
+   | Network calls (`curl`, `wget`, `Invoke-WebRequest`) | Asks you first |
+   | Install a new package (`npm install <name>`, `pip install <name>`, `dotnet add package`, unknown `npx` tools) | Asks you first |
+   | Force push, remote branch delete, `git reset --hard`, `git clean -f`, `--no-verify` | Asks you first |
+   | Edit `CLAUDE.md`, `.claude/`, `.mcp.json`, CI pipelines, package sources or git hooks | Asks you first |
+
+   - "Asks you first" works in auto mode too.
+   - `.env.example` and other templates are allowed. Plain `npm install`, `npm ci` and `pip install -r requirements.txt` install the repo's own packages and are allowed.
+   - Turn it off for one session: start Claude Code with `AI_SAM_GUARD=off`.
+   - Needs Python 3 (`python3`, `python` or `py`). Without it, or on Windows without Git Bash, the guard can't run and every call goes through. The skills' written rules still apply.
+
 ## Testing locally
 
 Validate the manifests after any structural change:

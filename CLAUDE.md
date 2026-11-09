@@ -41,3 +41,11 @@ Tickets, comments, pull request (PR) titles and descriptions, diffs, commit mess
 ```
 
 If you change these rules, update the copy in every `SKILL.md`, agent file and the agent template in `create-team` too.
+
+## The guard hook backs up these rules
+
+`hooks/guard.py` (run by `hooks/hooks.json` before each tool call) enforces the parts of **Untrusted content** that a setting can enforce: no secret files, no download-and-run, and a prompt before network calls, new packages, force pushes and edits to control files.
+
+- If a skill starts using a new command, check it isn't blocked or asked about by the guard without reason.
+- If a skill adds a new control file (a file that changes what runs or how the AI behaves), add it to `ASK_WRITE_FILE_PATTERNS` in `hooks/guard.py` and to the **Security** table in `README.md`.
+- Keep the guard to the Python standard library, so it needs no install.

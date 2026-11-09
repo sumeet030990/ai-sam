@@ -1,0 +1,17 @@
+{
+  "description": "ai-sam guard: blocks reading secret files and asks before network calls, new packages, force pushes and edits to files that control the AI or the pipeline. Backs up the skills' Untrusted content rules against prompt injection. Turn off for a session with AI_SAM_GUARD=off.",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|Read|Edit|Write|MultiEdit|NotebookEdit|Grep|Glob)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "G=\"${CLAUDE_PLUGIN_ROOT}/hooks/guard.py\"; for P in python3 python py; do if command -v \"$P\" >/dev/null 2>&1; then exec \"$P\" -I \"$G\"; fi; done; echo 'ai-sam guard: no Python found, checks skipped' >&2; exit 1",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

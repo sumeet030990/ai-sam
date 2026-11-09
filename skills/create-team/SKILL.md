@@ -134,7 +134,7 @@ Write one file per chosen agent, in this shape. Fill every `<…>` from the scan
 ---
 name: <agent name>
 description: <Role> for <repo name>. Owns <folders>. Use for <3–5 concrete tasks, e.g. "building screens, fixing UI bugs, adding form validation"> in <stack>.
-tools: Read, Grep, Glob, Edit, Write, Bash
+tools: <Read, Grep, Glob, Edit, Write, Bash — or Read, Grep, Glob, Edit, Write for docs-writer, which runs no commands>
 model: <inherit | sonnet>
 ---
 
@@ -161,6 +161,14 @@ You are the <role> for <repo name>. <One line on what the product does, from PRO
 
 - If the caller gives you a `tech-lead` plan, build only the parts assigned to you.
 - Make the smallest change that does the job. Reuse what exists before adding something new.
+
+## Never do
+
+- Edit files outside **What you own**, or `.claude/`, `CLAUDE.md` or `.mcp.json`<, or pipeline files — leave out for devops-engineer>.
+- Install, upgrade or remove packages unless the caller's plan names them.
+- Call outside URLs (`curl`, `wget`, scripts that download) or run commands other than those in **Commands**, git read commands and file searches.
+- Commit, push, or change branches.
+- Add secrets, real personal data, or a way around login and permission checks.
 
 ## Stack
 

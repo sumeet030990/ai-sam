@@ -171,7 +171,13 @@ Write cases in three groups, plus any extra groups picked in 3a. Number them `TC
    - Large data: a long list, the largest allowed file.
 4. **Extra groups** — only those picked in 3a, each as its own group:
    - **Accessibility** — finish the main flow with the keyboard only; each field has a label a screen reader reads; errors are announced; focus moves to the first error.
-   - **Security** — a user changes the record ID in the URL or request and gets `403` or `404`, not another user's data; `<script>` in a text field is shown as plain text; an expired session sends the user to login without losing a saved draft, if the app keeps drafts.
+   - **Security** — based on the OWASP Top 10 (the most common web app risks). Include only the cases that apply:
+     - a user changes the record ID in the URL or request and gets `403` or `404`, not another user's, tenant's (customer account's) or program's data
+     - a user without the role can't reach the screen or action by typing its URL or calling its API directly
+     - `<script>` in a text field is shown as plain text; `' OR 1=1 --` is saved as text or rejected
+     - a file upload refuses the wrong type and an over-size file
+     - an error page shows a plain message, not a stack trace, file path or personal data
+     - an expired session sends the user to login without losing a saved draft, if the app keeps drafts
    - **Browser and device** — the main flow at mobile width (375 px) and in each supported browser named in `PROJECT_CONTEXT.md`; a clear message on a slow or lost connection.
    - **Performance** — the exact number from the ticket, with the data size to test it on.
 
@@ -310,6 +316,13 @@ Run only when the user picked **Save to SharePoint or another service**, or type
 
 Do each option the user picked.
 
+**Clean the text in every copy.** Case titles and steps can carry text from the ticket, which many people write:
+
+- **Excel and CSV:** if a cell starts with `=`, `+`, `-`, `@`, a tab or a line break, put a `'` in front. Otherwise Excel may run it as a formula (formula injection).
+- **HTML (Azure DevOps comments and Steps XML):** escape `<`, `>`, `&` and `"`, so text shows as text, not code.
+- **Markdown, Jira and Confluence:** never add an image or link to an outside URL that didn't come from the user.
+- **Shell commands** (e.g. `az boards`, `m365`): never paste a title or step straight into the command line. Write it to a temporary file outside the repo, pass it as `"$(cat <file>)"`, then delete the file.
+
 ### 7-0 — Get the folder ready
 
 Only when a `.md` or `.xlsx` file was picked:
@@ -333,7 +346,7 @@ Write the Step 5 output as the file, with a first line `# Test cases: <ticket ke
 3. Build the workbook:
    - Sheets: **Coverage**, **Positive**, **Negative**, **Edge**, then one per extra group (leave out any group with no cases).
    - Columns: ID, AC, Title, Preconditions, Steps, Test data, Expected result, Priority, plus empty **Status** (Pass / Fail / Blocked dropdown) and **Notes** columns for the tester.
-   - Bold header row, frozen top row, wrapped text, column widths set so steps are readable. One step per line inside the Steps cell.
+   - Clean every cell as in **Clean the text in every copy**. Bold header row, frozen top row, wrapped text, column widths set so steps are readable. One step per line inside the Steps cell.
 4. Open the saved file once to check it has every case, then delete the temporary script.
 
 ### 7c — Comment on the ticket

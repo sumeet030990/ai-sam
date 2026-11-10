@@ -78,12 +78,15 @@ Then ask for these with AskUserQuestion, up to 4 per call, with suggested option
 2. One-paragraph description — what it does (a draft from the README in the option's preview)
 3. Problem it solves / business goal (a draft from the README, or `To be decided`)
 4. Project root path — the current working directory (Recommended), the git top-level folder if it differs
-5. Repository URL — the git remote URL if set, `Not applicable`, `To be decided`
+
+Don't ask for these two. Detect them and show them in the Step 4 summary, where the user can change them:
+
+- **Repository URL** — the output of `git remote get-url origin`. If there is no remote, record `Not applicable`.
+- **Stage** — `New (greenfield)` if the project root has no source code yet; otherwise `In development`. Use `In production / maintenance` only if the README or earlier answers say it is live.
 
 Then use AskUserQuestion for the structured items:
 
 - **Project type** — Web app, API / backend service, Mobile app, Retry previous answer (Library / CLI / other through "Other")
-- **Stage** — New (greenfield), In development, In production / maintenance, Retry previous answer
 - **Part of a larger system?** — No, standalone; Yes, with other repos (backend + frontend, microservices, micro-frontends); Yes, a package inside a monorepo; Retry previous answer
 
 If it is part of a larger system, also ask (AskUserQuestion with suggestions such as the parent folder's name, `../SYSTEM_CONTEXT.md`, and exposes/consumes lines drafted from routes, clients or contract files you can see): the system's name, where its `SYSTEM_CONTEXT.md` is or will be (path relative to this repo such as `../SYSTEM_CONTEXT.md`, or a repo URL — `To be decided` if it doesn't exist yet), and, in one line each, the APIs, events or modules this repo **exposes** and the ones it **consumes** from other components. Record names and where the contract files live (OpenAPI, `.proto`, event schemas) — not full endpoint lists.
@@ -161,7 +164,7 @@ Ask one AskUserQuestion per purpose (up to 4 per call), with the commands you fo
 ## Step 4 — Confirm and write
 
 1. Ask where to save the file. Options: `<project root>/PROJECT_CONTEXT.md` (Recommended), `<project root>/docs/PROJECT_CONTEXT.md`, Retry previous answer.
-2. Show the user a short summary of what will be written (in the option's `preview`) and ask: Looks good, write it (Recommended), Change something, Retry previous answer.
+2. Show the user a short summary of what will be written (in the option's `preview`), with the detected **Repository URL** and **Stage** near the top, and ask: Looks good, write it (Recommended), Change something, Retry previous answer.
 3. Write the file using the template below. Drop optional sections that have nothing in them; keep the **Dependency & version policy** section always.
 4. Offer to add `@PROJECT_CONTEXT.md` to the project's `CLAUDE.md` (create it if missing) so every future session loads the context automatically. Ask with options: Yes, add it (Recommended), No, Retry previous answer. Only do this if the user agrees.
 5. End by telling the user the file path and how to refresh it later (re-run this skill).

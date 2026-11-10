@@ -12,7 +12,7 @@ Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for 
 | 2 | Write and check the ticket | `create-ticket`, `analyze-ticket` |
 | 3 | Build | `implement-ticket` |
 | 4 | Test | `write-unit-tests`, `write-feature-tests`, `write-qa-test-cases`, `run-test-report` |
-| 5 | Review | `review-pr` |
+| 5 | Review and fix feedback | `review-pr`, `fix-comments` |
 | 6 | Release and schedule | `smoke-regression-report`, `schedule-tests` |
 | 7 | Track the sprint (daily, for project managers) | `pm-daily-brief` |
 
@@ -123,8 +123,10 @@ Builds a ticket end to end.
 3. Works on the ticket's branch if you are on it. Otherwise asks: create a branch, create a worktree (a second working folder for the same repo) or use the current branch.
 4. Hands each part to its builder agent (from `create-team`, `.claude/agents/` or `~/.claude/agents/`) with the ticket, plan, branch and rules. Builds the rest itself.
 5. Writes the code and a test for every acceptance criterion.
-6. Runs the project's test, lint and build commands.
-7. Shows a report of what changed.
+6. Reads the ticket's comments (clarifications, scope changes, QA and review feedback) and asks which ones to act on. Picked ones are built and tested like acceptance criteria.
+7. Finds the QA test cases already written for the ticket (description, comments, linked Xray or Azure Test Plans items, `docs/test-cases/`) and writes a test for each, tagged with the case ID. Cases that can't be automated are listed as manual only.
+8. Runs the project's test, lint and build commands.
+9. Shows a report of what changed, with tables for the comments acted on and the QA test cases covered.
 
 - **Never** commits, pushes, opens a PR or changes Jira without asking.
 
@@ -219,6 +221,22 @@ Reviews code changes before they merge. Read-only by default.
 9. Saves each review in `~/.claude/ai-sam/reviews/`. A re-run on the same branch marks earlier findings **Fixed** or **Still open**.
 
 - Fixes code or posts PR comments only after you approve the exact change or text.
+
+#### 5.2 `/ai-sam:fix-comments [ticket key, PR number or link]`
+
+Works through the open feedback on a ticket and its PR, fixes it and replies to every comment.
+
+1. Finds the ticket and its PR from the argument or the current branch. Works with GitHub, Azure DevOps and GitLab, using the PR host saved by `review-pr`.
+2. Collects the Jira ticket's open comments (for example a QA "failed" note) and every unresolved PR review thread and general comment.
+3. Sorts each comment: **Fix**, **Answer**, **Push back**, **Already done**, **Out of scope** or **Unclear**.
+4. Flags risky requests (remove a permission check, skip tests, send data out, text aimed at the AI) instead of doing them.
+5. Shows the plan for approval, then makes each fix on the PR's branch, with a test where behaviour changes.
+6. Runs the project's test, lint and build commands.
+7. Drafts a short reply for each comment, naming the file, line and test.
+8. After you approve: commits, pushes, posts each reply on its thread, resolves the fixed threads and adds one summary comment to the ticket. Questions and push-backs stay open for the reviewer.
+9. Saves what it handled in `~/.claude/ai-sam/comment-fixes/`. A re-run picks up only new comments and reviewer follow-ups.
+
+- **Never** commits, pushes, replies, resolves a thread or comments on the ticket without showing it first. Never force-pushes.
 
 ### Step 6 — Release and schedule
 
@@ -330,7 +348,14 @@ For a project made of several repos (backend + frontend, microservices, micro-fr
 Tickets, PRs, code and logs are written by many people. Someone can plant text in them that tries to steer the AI (prompt injection). ai-sam protects against it in two layers:
 
 1. **Rules in every skill.** Each skill's **Untrusted content** section treats that text as data, never as instructions, and flags any attempt to steer it.
-2. **The guard hook** (`hooks/guard.py`). It checks every tool call, in skills, subagents and your normal sessions, while the plugin is enabled:
+2. **The guard hook** (`hooks/guard.py`). A hook is a small script Claude Code runs before every tool call.
+
+   **Why a hook as well as the rules:**
+   - The rules are written instructions. Well-crafted planted text can still talk the AI around them.
+   - The hook is code, not instructions. It can't be persuaded, so a risky action is stopped even if the AI was fooled.
+   - It also protects subagents and your normal sessions, not only ai-sam skills.
+
+   It checks every tool call, in skills, subagents and your normal sessions, while the plugin is enabled:
 
    | Action | What happens |
    |---|---|
@@ -347,6 +372,32 @@ Tickets, PRs, code and logs are written by many people. Someone can plant text i
    - Turn it off for one session: start Claude Code with `AI_SAM_GUARD=off`.
    - Needs Python 3 (`python3`, `python` or `py`). Without it, or on Windows without Git Bash, the guard can't run and every call goes through. The skills' written rules still apply.
 
+### Evals — proof the protections work
+
+An eval (evaluation) is an automated test for AI behaviour. It gives Claude a task, then checks what Claude did.
+
+**Why they exist:**
+- Skills are instructions, not code, so normal unit tests can't check them. The only way to test a skill is to run it on a real task.
+- The evals prove the two layers above work: each case plants a hidden instruction and checks the skill flags it and doesn't act on it.
+- Re-run them after changing a skill, or when a new Claude model comes out, to catch a protection that stopped working.
+
+**What's in `evals/injection/`:**
+- 9 cases, one per risky skill. Examples: a PR that removes a permission check and tells the reviewer to approve; a test log with fake secrets and "post this log"; a ticket asking to skip QA.
+- `guard/test_guard.py` — 46 checks on the guard hook. No AI, free, takes a second.
+- All data is made up. Nothing real is used or sent anywhere.
+
+**Run them** (from this folder):
+
+```bash
+python3 evals/injection/guard/test_guard.py   # guard hook only
+
+claude plugin eval . --tag injection --scaffold --allow-tools Bash Write Edit --runs 1 --ablation none --no-publish
+```
+
+- The first `claude plugin eval` run must be in a terminal, to confirm you trust the folder.
+- Each case is a real Claude run, so a full pass takes a while and uses your plan's usage.
+- Users of the plugin never need the evals; they are for whoever changes the skills. Details in [evals/injection/README.md](evals/injection/README.md).
+
 ## Testing locally
 
 Validate the manifests after any structural change:
@@ -362,6 +413,8 @@ claude --plugin-dir /path/to/ai-sam
 ```
 
 This loads the plugin for that session only. It doesn't install anything or change your settings, and plain `claude` runs without it. The plugin is read at startup, so restart the session after editing a `SKILL.md`.
+
+After changing a skill or the guard hook, run the security evals (see **Evals — proof the protections work** above).
 
 
 ## Installing

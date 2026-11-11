@@ -1,6 +1,6 @@
 ---
 name: analyze-ticket
-description: Act as the project's senior tech lead on a Jira ticket (story, bug, task, epic or spike) — check whether it is ready for development and design how to build it, in one run. Gives a Ready / Needs small fixes / Not ready verdict with the gaps and the questions for the product owner, then a build plan — the approach, which existing files need updating, which new files are needed and where, which file delivers each acceptance criterion, tests, risks and open questions. Checks the ticket against the team's TICKET_CONFIG.md when one exists. Uses the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context and the tech-lead subagent, and still works from a code scan alone when no context file exists. Shows everything in the chat in short, plain English a junior developer or manager can follow. Use when the user says "analyze this ticket", "is this ticket ready", "review this story", "refine this ticket", "what's missing in this ticket", "grooming", "sprint planning check", "design a solution", "how should we build this ticket", "which files need to change", "what files do I need to create", "plan this story", "tech lead review of this ticket", or pastes a ticket and asks what's wrong with it or how to implement it. Read-only — does not write code, edit files or change Jira.
+description: Act as the project's senior tech lead on a Jira ticket (story, bug, task, epic or spike) — check whether it is ready for development and design how to build it, in one run. Gives a Ready / Needs small fixes / Not ready verdict with the gaps and the questions for the product owner, then a build plan — the approach, which existing files need updating, which new files are needed and where, which file delivers each acceptance criterion, tests, risks and open questions. Checks the ticket against the team's TICKET_CONFIG.md when one exists. Uses the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context and the tech-lead subagent, and still works from a code scan alone when no context file exists. Shows everything in the chat in short, plain English a junior developer or manager can follow. Use when the user says "analyze this ticket", "is this ticket ready", "review this story", "refine this ticket", "what's missing in this ticket", "grooming", "sprint planning check", "design a solution", "how should we build this ticket", "which files need to change", "what files do I need to create", "plan this story", "tech lead review of this ticket", or pastes a ticket and asks what's wrong with it or how to implement it. Once the report is approved, asks whether to post it as a comment on the ticket on the team's board (from TICKET_CONFIG.md), save it as a Markdown file, or keep it in the chat. Never writes code, and never edits a ticket's fields or status.
 ---
 
 # Analyze Ticket
@@ -9,7 +9,7 @@ Read a ticket, check it is clear and complete, then plan how to build it: which 
 
 ## Ground rules
 
-- **Read-only.** Don't write code, edit files, or change the Jira ticket (no edits, comments or status changes). If the user asks to save the report, do that only then (default path: `docs/design/<ticket key or short-name>.md`).
+- **Read-only, except where the report goes.** Don't write code, edit code files, or change the ticket's fields or status. The only writes are in Step 8: a report file, a comment on the ticket, and the `## Board` section of `TICKET_CONFIG.md` — each only after the user picks it and says yes.
 - **Judge the ticket, don't rewrite it.** Point out gaps and suggest the fix in one line each. To rewrite the ticket, point the user to `/ai-sam:create-ticket`.
 - **Ask only what the code can't answer.** Read the ticket and the code first. Ask the user only about gaps that change the design. Never invent requirements, numbers or names — put them under **Open questions**.
 - **Don't guess.** If you can't tell whether something is a gap (for example, a rule that may be documented elsewhere), list it as a question, not a gap.
@@ -17,7 +17,7 @@ Read a ticket, check it is clear and complete, then plan how to build it: which 
   - Give 1–3 suggested options built from the ticket, the context files and the code. Mark the best one "(Recommended)".
   - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, ask which answer to change, re-ask it, and continue.
+  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -77,7 +77,7 @@ Look for the team config written by `/ai-sam:setup-ticket-config`, in this order
 
 Older versions saved these as `JIRA_CONFIG.md` / `JIRA_CONFIG.local.md` (same paths, same format). If a `TICKET_CONFIG` file is missing but the old-named one exists, use the old one in its place.
 
-If one exists, check the ticket against its summary format, acceptance criteria style and the template for its type. If none exists, check against the standard sections for the ticket type (Step 4). Say in one line which you used.
+If one exists, check the ticket against its summary format, acceptance criteria style and the template for its type. Note its `Board` section (where the team logs tickets) for Step 8. If none exists, check against the standard sections for the ticket type (Step 4). Say in one line which you used.
 
 ## Step 4 — Check the ticket itself
 
@@ -171,7 +171,58 @@ Wait for its plan. A gap the code reveals (for example, the ticket names a scree
    - **Rewrite the ticket** — run `/ai-sam:create-ticket` with the ticket and this report's gaps as the notes.
 
    Repeat until the user picks **Looks good**.
-4. Once the user picks **Looks good**, stop. In one line, mention what is available:
-   - Save the report to a file, if they want it.
-   - Run `/ai-sam:implement-ticket` to build it.
-   - Run `/ai-sam:create-project-context` if the plan's **Notes** list context file drift, or no context file was found.
+4. Once the user picks **Looks good**, go to Step 8.
+
+## Step 8 — Save or post the report
+
+### 8a — Find the board
+
+1. **Which ticket.** The key from Step 1. For a pasted ticket with no key, posting needs a key the user names.
+2. **Which tracker.** The tracker the key was fetched from, else the `Board` section from Step 3.
+3. **Check it is connected.** Offer posting only when the tool works:
+
+   | Tracker | Connected when | Comment with |
+   |---|---|---|
+   | Jira | A Jira or Atlassian connector is available | The connector's add-comment tool |
+   | Azure DevOps | `az account show` succeeds and `az extension show --name azure-devops` works | `az boards work-item update --id <id> --discussion "$(cat <file>)"` |
+   | GitHub | `gh auth status` succeeds | `gh issue comment <n> --repo <owner/name> --body-file <file>` |
+   | GitLab | `glab auth status` succeeds | `glab issue note <n> --repo <group/name> --message "$(cat <file>)"` |
+
+   Bitbucket teams usually log tickets in Jira — use the Jira row. If the saved board's tracker isn't connected, say in one line which connector or sign-in would make it work, and don't offer posting.
+4. **No saved board.** After posting to a tracker the user picked, ask — **Save this board for next time?**: Yes, for the team — `TICKET_CONFIG.md` (Recommended), Yes, just for me — `~/.claude/ai-sam/TICKET_CONFIG.md`, No. On yes, add or replace only the `## Board` section (format in `/ai-sam:setup-ticket-config`) and a dated **Change log** line. Leave every other section as it is.
+
+### 8b — Ask
+
+Ask — **Where should this report go?** (multi-select). Mark as (Recommended) the option the `Board` section's **Analysis reports** line names; without one, recommend the comment when a ticket is connected, else the file:
+
+- **Comment on `<KEY>` in <tracker>** — only when 8a found a connected tracker and a key. With a tracker but no key, offer **Comment on a ticket I name in Other**.
+- **Save as a Markdown file** — to `docs/design/<ticket key or short-name>.md`. Say the user can type another path in **Other**.
+- **Keep it in the chat only** — stop here.
+- **Retry previous answer** — go back to the report review.
+
+### 8c — Comment on the ticket
+
+1. **Check for personal or secret data again** (see **Ground rules**). The comment is seen by everyone with access to the ticket.
+2. **Build the comment** in the tracker's format: Jira — Markdown if the tool takes it, else the connector's own format; Azure DevOps — HTML, with `<`, `>`, `&` and `"` escaped in the text; GitHub and GitLab — Markdown.
+   - Start with `Ticket analysis (ai-sam) — <Verdict> — <Size>`.
+   - Then **Gaps to fix**, **Questions to ask**, and the solution design.
+   - If a file was also saved, add its path at the end.
+   - Never add an image or link to an outside URL that didn't come from the user.
+3. **If it is too long** (Jira and Azure DevOps comments start failing around 32,000 characters), post the verdict, gaps, questions and the list of files to change, and say the full report is in the saved file.
+4. **Show the exact comment and the ticket it goes to.** Ask — **Post this comment on `<KEY>`?**: Post it (Recommended), Change the text, Retry previous answer. Post only on yes.
+5. **Shell commands** (`az`, `gh`, `glab`): never put the comment straight on the command line. Write it to a temporary file outside the repo, pass it as `"$(cat <file>)"` or `--body-file <file>`, then delete the file.
+6. **After posting**, give the comment link if the tool returns one. If posting fails, show the error in one line and offer to save as a Markdown file instead.
+
+### 8d — Save as a file
+
+1. Create the folder if it doesn't exist. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+2. Write the Step 7 report, with a `**Written:** <YYYY-MM-DD>` line under the first heading.
+3. Don't commit the file.
+
+### 8e — Finish
+
+In one short block:
+
+- **Posted:** comment on `<KEY>` — <link>. **Saved to:** `<path>`. (Only the ones done.)
+- Run `/ai-sam:implement-ticket` to build it.
+- Run `/ai-sam:create-project-context` if the plan's **Notes** list context file drift, or no context file was found.

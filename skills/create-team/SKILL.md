@@ -19,7 +19,7 @@ Look at the repo, suggest the specialist agents it needs, and write the ones the
   - Give 1–3 suggested options built from the scan. Mark the best one "(Recommended)".
   - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, ask which answer to change, re-ask it, and continue.
+  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **Don't change anything else.** No installs, builds, commits or pushes. Only create or update files in the chosen agents folder, and the **Team** section of the repo's `CLAUDE.md`.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth

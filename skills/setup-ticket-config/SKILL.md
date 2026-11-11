@@ -1,17 +1,18 @@
 ---
 name: setup-ticket-config
-description: Interview the user once about their team's ticket conventions (for Jira, Bitbucket, Azure DevOps, GitHub, GitLab or any other tracker) (summary format, acceptance criteria style, and custom templates that replace the standard Story, Bug, Task, Epic or Spike formats) and save them in a TICKET_CONFIG.md file that create-ticket reads before writing a ticket. Saves a personal user-level file (~/.claude/ai-sam/TICKET_CONFIG.md), a shared repo-level file (TICKET_CONFIG.md in the repo root) that overrides it section by section, or a personal repo-level file (TICKET_CONFIG.local.md, gitignored) that overrides the team's repo file for one person. Use when the user says "set up ticket config", "set up Jira config", "configure Jira tickets", "configure Bitbucket issues", "save our ticket template", "use our team's ticket format", "set the summary tags", "use Gherkin acceptance criteria", or wants create-ticket to follow team rules. Also use to update or reset an existing TICKET_CONFIG.md. Does not connect to any tracker or create tickets.
+description: Interview the user once about their team's ticket conventions (for Jira, Bitbucket, Azure DevOps, GitHub, GitLab or any other tracker) (summary format, acceptance criteria style, custom templates that replace the standard Story, Bug, Task, Epic or Spike formats, and the board where tickets are logged) and save them in a TICKET_CONFIG.md file that create-ticket and analyze-ticket read. Saves a personal user-level file (~/.claude/ai-sam/TICKET_CONFIG.md), a shared repo-level file (TICKET_CONFIG.md in the repo root) that overrides it section by section, or a personal repo-level file (TICKET_CONFIG.local.md, gitignored) that overrides the team's repo file for one person. Use when the user says "set up ticket config", "set up Jira config", "configure Jira tickets", "configure Bitbucket issues", "save our ticket template", "use our team's ticket format", "set the summary tags", "use Gherkin acceptance criteria", "set our ticket board", "which board do we log tickets on", or wants create-ticket to follow team rules. Also use to update or reset an existing TICKET_CONFIG.md. Does not create tickets or change anything in the tracker; it only reads the tracker to suggest board values.
 ---
 
 # Setup Ticket Config
 
 Ask the user how their team writes tickets (in Jira, Bitbucket, Azure DevOps, GitHub, GitLab or any other tracker), then save the answers in a `TICKET_CONFIG.md` file. `/ai-sam:create-ticket` reads that file and follows it, so the user doesn't repeat these choices on every ticket.
 
-The file holds three things:
+The file holds four things:
 
 1. **Summary format** — how ticket titles are written (plain, with tags like `[FE]`, or a custom pattern).
 2. **Acceptance criteria style** — checklist bullets or Gherkin (Given / When / Then).
 3. **Templates** — full replacements for any of the standard Story, Bug, Task, Epic or Spike templates.
+4. **Board** — where the team logs tickets (tracker, project, board), so create-ticket can create tickets there and analyze-ticket can post its report.
 
 ## Ground rules
 
@@ -21,7 +22,7 @@ The file holds three things:
   - Put examples and drafts in the option's `preview` so the user can see exactly what they're choosing.
   - The user can always type their own answer in the built-in **Other** textbox. Say so in the question text.
   - Group up to 4 related questions in one call.
-- **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, ask which answer to change (default: the one just before), re-ask it, and return to where you were. The user can also say "go back" at any time.
+- **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question. The user can also say "go back" at any time.
 - **Only ask about what's being changed.** Each section is optional. A section the user skips is left out of the file, and create-ticket falls back to the next file or the standard behaviour for it.
 - **No personal or secret data.** Templates and examples must use placeholders (`<role>`, `<page>`) or made-up data ("Test User", "Applicant A"). Never copy into the file:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
@@ -64,7 +65,7 @@ The repo root is `git rev-parse --show-toplevel`, or the current folder if it is
 | 2 | Repo | `TICKET_CONFIG.md` in the repo root | Team rules for one repo; can be committed and shared |
 | 3 | User | `~/.claude/ai-sam/TICKET_CONFIG.md` | Personal defaults across every repo |
 
-The files combine **section by section**: for each section, the highest-priority file that sets it wins. The sections are: `Summary format`, `Acceptance criteria style`, and each template type under `Templates` (`Story`, `Bug`, `Task`, `Epic`, `Spike`) on its own. Anything no file sets uses create-ticket's standard behaviour.
+The files combine **section by section**: for each section, the highest-priority file that sets it wins. The sections are: `Summary format`, `Acceptance criteria style`, each template type under `Templates` (`Story`, `Bug`, `Task`, `Epic`, `Spike`) on its own, and `Board`. Anything no file sets uses create-ticket's standard behaviour.
 
 A section set to `Standard` means "use the standard behaviour" and still counts as set, so a repo file can switch a user-level custom template back to the standard one, and a local file can do the same for a team template.
 
@@ -83,7 +84,7 @@ Keep a local file small: only the sections the person wants different from the t
 
    Name the full path in each option's description, and note which files already exist.
 3. If the chosen file exists, show a short summary of what it sets and ask: **Update some sections (Recommended)**, **Start over**, **Show the file only**.
-   - **Update some sections** — ask which sections to change (multi-select: Summary format, Acceptance criteria style, Templates). Run only those steps and keep the rest of the file as it is.
+   - **Update some sections** — ask which sections to change (multi-select: Summary format, Acceptance criteria style, Templates, Board). Run only those steps and keep the rest of the file as it is.
    - **Start over** — run every step; the file is replaced at the end.
    - **Show the file only** — show it and stop.
 4. As you go, say which sections of lower-priority files the chosen file will override: the user file's for the repo scope, and the repo and user files' for the local scope.
@@ -155,7 +156,27 @@ A custom template **fully replaces** the standard one for that ticket type. Type
    - Add a one-line HTML comment under any section heading whose purpose isn't obvious, saying what goes there (e.g. `<!-- Which existing features this could break -->`). create-ticket turns these into questions.
 4. Show the cleaned template and ask: **Looks good (Recommended)**, **Retry with edits**, **Retry previous answer**. For **Retry with edits**, ask what to change (Rename a section, Add a section, Remove a section, Other), apply only that, and show it again.
 
-## Step 4 — Confirm and write
+## Step 4 — Ticket board
+
+Where the team logs its tickets. `/ai-sam:create-ticket` creates tickets here, and `/ai-sam:analyze-ticket` posts its report here. Never ask for or save passwords, tokens or any other credential — only where tickets go.
+
+1. Ask **Where does the team log tickets?**: the tracker the repo points to (Recommended — a Jira key in recent commit messages or branch names suggests Jira; an `azure.com` remote suggests Azure DevOps; a `github.com` or GitLab remote suggests GitHub or GitLab), one or two others from Jira, Azure DevOps, GitHub issues, GitLab issues, Retry previous answer. Bitbucket teams usually log tickets in Jira — say so. Say the user can type another tracker in **Other**, or **Skip** to leave this section out.
+2. Ask for the details that tracker needs, in one call. If the tracker is connected (see the table), list the real projects, boards or teams as options; otherwise suggest values from the repo:
+
+   | Tracker | Connected when | Details to ask |
+   |---|---|---|
+   | Jira | A Jira or Atlassian connector is available | Project key (e.g. `NCD`), board name (optional) |
+   | Azure DevOps | `az account show` succeeds and `az extension show --name azure-devops` works | Organization URL, project, area path and iteration (optional) |
+   | GitHub | `gh auth status` succeeds | Repo as `owner/name` (default: this repo's remote) |
+   | GitLab | `glab auth status` succeeds | Project as `group/name` (default: this repo's remote) |
+   | Other | — | Board link. Tickets are pasted in by hand |
+
+3. Ask, in one call:
+   - **Default labels or components for new tickets** (optional) — suggest any the project already uses; **None** (Recommended when unsure).
+   - **Where should analyze-ticket reports go by default?**: Comment on the ticket (Recommended), Markdown file in the repo, Ask each time.
+4. Show the section in a `preview` and ask: **Looks good (Recommended)**, **Retry with edits**, **Retry previous answer**.
+
+## Step 5 — Confirm and write
 
 1. Build the file from the **Config file format** below with only the sections the user set (plus, in **Update some sections**, the sections already in the file).
 2. Show the whole file in the chat and ask: **Save it (Recommended)**, **Retry with edits**, **Retry previous answer**.
@@ -164,7 +185,7 @@ A custom template **fully replaces** the standard one for that ticket type. Type
 5. Finish with three short lines:
    - where the file was saved;
    - for the repo scope: it can be committed so the team shares it (don't commit it yourself); for the local scope: it stays on this machine and only affects this user's tickets;
-   - `/ai-sam:create-ticket` will now use it — and if more than one file exists, which file each section comes from.
+   - `/ai-sam:create-ticket` and `/ai-sam:analyze-ticket` will now use it — and if more than one file exists, which file each section comes from.
 
 ## Config file format
 
@@ -173,7 +194,7 @@ All three scopes use the same format. Use these exact headings, because create-t
 `````markdown
 # Ticket Config
 
-<!-- Written by /ai-sam:setup-ticket-config and read by /ai-sam:create-ticket.
+<!-- Written by /ai-sam:setup-ticket-config and read by /ai-sam:create-ticket and /ai-sam:analyze-ticket.
      Section by section, TICKET_CONFIG.local.md overrides the repo's TICKET_CONFIG.md,
      which overrides ~/.claude/ai-sam/TICKET_CONFIG.md.
      "Standard" means use create-ticket's built-in behaviour. -->
@@ -206,6 +227,15 @@ All three scopes use the same format. Use these exact headings, because create-t
 
 ### Spike
 …
+
+## Board
+- **Tracker:** <Jira | Azure DevOps | GitHub | GitLab | Other>
+- **Project:** <Jira project key | Azure DevOps organization URL and project | GitHub owner/name | GitLab group/name>
+- **Board:** <board or team name, or board link for Other> (optional)
+- **Area path:** <area path> (Azure DevOps only, optional)
+- **Iteration:** <iteration path> (Azure DevOps only, optional)
+- **Default labels:** <labels or components, or None>
+- **Analysis reports:** <Comment on the ticket | Markdown file | Ask each time>
 
 ## Change log
 - <YYYY-MM-DD> — <what was set or changed>

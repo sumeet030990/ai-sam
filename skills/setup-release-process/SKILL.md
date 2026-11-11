@@ -29,7 +29,7 @@ The section covers nine areas:
   - Put examples and drafts in the option's `preview` so the user sees exactly what will be saved.
   - The user can always type their own answer in the built-in **Other** textbox. Say so in the question text.
   - Group up to 4 related questions in one call.
-- **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, ask which answer to change (default: the one just before), re-ask it, update the answer, and return to where you were. The user can also say "go back" at any time. When the user types their own answer in **Other**, repeat back what you recorded in the next question.
+- **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question. The user can also say "go back" at any time. When the user types their own answer in **Other**, repeat back what you recorded in the next question.
 - **Only ask about what's being changed.** On an update, run only the steps the user picks and keep the rest of the section as it is.
 - **Read Jira; never change it.** Only search and read. Never create, edit or release a version, sprint or ticket.
 - **Record roles, not people.** Write "QA lead" or "Release manager", never a person's name, for approvals, owners and ceremony hosts. The only name this skill may record is the contributor's, with consent (Step 0).

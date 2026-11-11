@@ -61,7 +61,8 @@ Saves how your team writes tickets, once. Works for any tracker: Jira, Bitbucket
 1. Asks for the summary format (for example `[FE]` tags or a custom pattern).
 2. Asks for the acceptance criteria style: checklist or Gherkin (Given / When / Then).
 3. Asks for any custom templates that fully replace the standard Story, Bug, Task, Epic or Spike formats.
-4. Asks where to save it:
+4. Asks which board the team logs tickets on (Jira project, Azure DevOps project, GitHub or GitLab repo), and where analysis reports go by default.
+5. Asks where to save it:
    - **Team, this repo:** `TICKET_CONFIG.md` in the repo root. Share it by committing it.
    - **Just you, all repos:** `~/.claude/ai-sam/TICKET_CONFIG.md`.
    - **Just you, this repo:** `TICKET_CONFIG.local.md` in the repo root (gitignored). Overrides the team's rules for you only.
@@ -93,12 +94,16 @@ Writes a clear ticket from your answers or rough notes, for any tracker (Jira, B
 3. Follows `TICKET_CONFIG.md` when one exists.
 4. Shows the ticket in the chat as Markdown, ready to paste into your tracker or any rich text editor.
 5. Offers **Retry** and **Retry with edits** before it is final.
+6. Then asks what to do with it:
+   - **Create it on the board** saved in `TICKET_CONFIG.md` (or one you pick). Checks for duplicates and shows the exact fields first.
+   - **Save as a Markdown file** in `docs/tickets/`.
+   - **Keep it in the chat.**
 
-- **Output:** ticket text in the chat.
+- **Output:** ticket text in the chat, and the new ticket on the board or a file if you pick one.
 
 #### 2.2 `/ai-sam:analyze-ticket [Jira key or pasted text]`
 
-Acts as the project's senior tech lead on a ticket. Read-only.
+Acts as the project's senior tech lead on a ticket. Never changes code or the ticket's fields.
 
 1. Checks the ticket is ready: clear goal, testable acceptance criteria, gaps, questions to ask.
 2. Gives a verdict: **Ready**, **Needs small fixes** or **Not ready**. Checks against `TICKET_CONFIG.md` when one exists.
@@ -109,8 +114,9 @@ Acts as the project's senior tech lead on a ticket. Read-only.
    - which file delivers each acceptance criterion
    - tests, risks and open questions
 5. Works from a code scan alone when no context file exists.
+6. Then asks where the report goes: a comment on the ticket on your board, a Markdown file in `docs/design/`, or the chat only. Shows the exact comment before posting.
 
-- **Output:** readiness verdict and build plan in the chat.
+- **Output:** readiness verdict and build plan in the chat, plus a ticket comment or file if you pick one.
 
 ### Step 3 — Build
 

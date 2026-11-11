@@ -329,6 +329,42 @@ Gives the project manager (PM) a short morning brief for the active sprint, from
 ## Subagents
 
 - `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `analyze-ticket`, `implement-ticket` and `review-pr`. It learns the project from the context files and the business rules from the code, then works out which files change. For `review-pr` it runs an impact review: who depends on the changed code and what could break. When the repo has a team from `create-team`, it says which agent builds each part. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
+- `deliver-ticket` (`ai-sam:deliver-ticket`) — takes one ticket from analysis to a reviewed pull request (PR) in one session, and posts each stage's result on the ticket.
+  - **Start it:** `claude --agent ai-sam:deliver-ticket`, then give the ticket key (e.g. `deliver ABC-123`).
+  - **Why a separate session:** the skills ask you questions and start `tech-lead`. A subagent can do neither, so this agent must be the main session.
+  - **Stages:**
+    1. `analyze-ticket` — verdict and build plan. Stops if the ticket is Not ready, unless you choose to build anyway.
+    2. `implement-ticket` — builds on a ticket branch, using the plan from stage 1.
+    3. `write-unit-tests` — unit tests for the branch changes.
+    4. `write-feature-tests` — feature tests for each acceptance criterion.
+    5. Commit, push and open the PR (GitHub, Azure DevOps or GitLab). Opens as a draft by default.
+    6. `review-pr` on the new PR. Up to 2 rounds of fixes, each committed and pushed on a yes.
+    7. A summary comment on the ticket, and an optional status change.
+  - **On the ticket:** one comment per stage (analysis, build, unit tests, feature tests, PR link, review verdict), or one summary at the end, or none — you pick at the start.
+  - **Asks first** before every commit, push, PR, PR comment, ticket comment and status change. Never force-pushes, merges or approves.
+  - **Picks up where it left off:** re-run with the same key and it finds the branch, the PR and its earlier ticket comments.
+- `deliver-ticket-auto` (`ai-sam:deliver-ticket-auto`) — the same stages as `deliver-ticket`, with no questions, so it can run in the background.
+  - **How it answers:** takes each skill's (Recommended) answer, except where a fixed decision table in the agent picks a safer one. Every choice is logged.
+  - **Safer than the recommendation in these places:**
+    - No test framework → skips that stage. It never adds packages.
+    - The PR is always a draft. It never marks it ready, merges or approves.
+    - Review findings are not fixed or posted as PR comments. A person decides from the review.
+    - Apps for feature tests start only with commands named in `PROJECT_CONTEXT.md`; otherwise the tests are written but not run.
+    - It never edits `CLAUDE.md`, `.claude/`, `TICKET_CONFIG.md` or other control files, and never changes the ticket's status.
+  - **Stops** on a Not ready ticket, a Blocked build, personal or secret data, or planted instructions. It posts a short "stopped at stage n" comment on the ticket and leaves the code uncommitted.
+  - **On the ticket:** posts each stage's comment without asking, marked "unattended run", then a summary.
+  - **Run log:** `~/.claude/ai-sam/runs/<KEY>-<date-time>.md`, updated after each stage. Check it while the run goes on.
+  - **Run it headless** (no chat window):
+
+    ```bash
+    claude -p "deliver ABC-123" --agent ai-sam:deliver-ticket-auto \
+      --permission-mode acceptEdits \
+      --allowedTools "Bash(git *)" "Bash(gh *)" "Bash(npm *)" "mcp__claude_ai_Atlassian__*"
+    ```
+
+    - Headless runs can't show permission prompts, so anything not allowed is blocked. Allow your repo's test and build tools and your tracker's tools (swap `gh` for `az` or `glab`, `npm` for `dotnet`, `pytest` and so on).
+    - Calls the guard hook would ask about (new packages, force pushes, network calls) are blocked. The agent logs them as skipped.
+  - **Or from a session:** ask "run deliver-ticket-auto on ABC-123 in the background". As a background helper it can't start `tech-lead`, so it does that design work itself.
 
 ### How ticket configs combine
 

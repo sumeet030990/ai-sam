@@ -1,6 +1,6 @@
 ---
 name: implement-ticket
-description: Build a Jira ticket (story, bug or task) in the code, end to end — get the ticket, reuse or make a plan with the tech-lead subagent, create a branch, find the QA test cases written for it (in the ticket, its comments, linked test items or docs/test-cases/), read the ticket's comments and, after the user picks which to act on, build those clarifications, changes and QA feedback too, write the code and a test for every acceptance criterion and QA test case, run the project's test, lint and build commands, check each criterion and QA test case is covered, and show a plain-English summary of what changed. Uses the PROJECT_CONTEXT.md / SYSTEM_CONTEXT.md from create-project-context for versions and commands, and checks for a builder agent (from create-team, .claude/agents/ or ~/.claude/agents/) that owns each part, handing it the ticket, plan, branch and rules in one brief. Use when the user says "implement this ticket", "build ABC-123", "work on this ticket", "code this story", "fix this bug", or runs /ai-sam:implement-ticket <ticket key>. Edits code on a new branch only; never commits, pushes, opens a PR or changes Jira without asking first.
+description: Build a Jira ticket (story, bug or task) in the code, end to end — get the ticket, reuse or make a plan with the tech-lead subagent, pull the latest code and create a branch, find the QA test cases written for it (in the ticket, its comments, linked test items or docs/test-cases/), read the ticket's comments and, after the user picks which to act on, build those clarifications, changes and QA feedback too, write the code and a test for every acceptance criterion and QA test case, run the project's test, lint and build commands, check each criterion and QA test case is covered, and show a plain-English summary of what changed. Uses the PROJECT_CONTEXT.md / SYSTEM_CONTEXT.md from create-project-context for versions and commands, and checks for a builder agent (from create-team, .claude/agents/ or ~/.claude/agents/) that owns each part, handing it the ticket, plan, branch and rules in one brief. Use when the user says "implement this ticket", "build ABC-123", "work on this ticket", "code this story", "fix this bug", or runs /ai-sam:implement-ticket <ticket key>. Edits code on a new branch only; never commits, pushes, opens a PR or changes Jira without asking first.
 ---
 
 # Implement Ticket
@@ -184,10 +184,19 @@ For each one found, don't build it yet. Ask — **Risky request in `<ticket fiel
 
 Never stash, reset or discard the user's changes yourself.
 
+**Get the latest code first.** Build on the newest code, not a stale copy:
+
+1. Run `git fetch origin --prune` before picking a branch, so remote branches and the start branch are current.
+2. After the branch is picked (below), pull it: `git pull --ff-only` (fast-forward only — never makes a merge commit or rewrites history). Skip this when the branch has no remote copy yet.
+3. If the fetch or pull fails (no network, branches have split apart, local changes in the way), don't merge, rebase or reset. Show the error in one line and ask — **Couldn't get the latest code. What now?**: Stop so I can fix it (Recommended), Carry on with the local code, Retry previous answer.
+4. Say in one line what came in, e.g. "Pulled 3 new commits into `<branch>`" or "Already up to date."
+
 **Already on the ticket's branch** — the current branch name (`git branch --show-current`) contains the ticket key, matched without case (`ABC-123` matches `feature/abc-123-upload`):
 
 - Work on it. Don't ask.
 - Say in one line: "You're on `<branch>`, the branch for <ticket key> — working here."
+- Pull it as in **Get the latest code first**.
+- Run `git rev-list --count HEAD..origin/<start branch>`. If the start branch has new commits, say how many. Don't merge them in unless the user asks.
 - Run `git log --oneline <base branch>..HEAD` and `git status` to see work already done. Build on it; don't redo it.
 
 **Not on the ticket's branch** — ask with AskUserQuestion:
@@ -205,10 +214,10 @@ Never stash, reset or discard the user's changes yourself.
 
 | Choice | Commands | If there are uncommitted changes |
 |---|---|---|
-| Switch to existing branch | `git switch <branch>` | Ask first — Stop so I can commit or stash them (Recommended), Carry them over, Retry previous answer. If git refuses, stop and tell the user. |
-| Create a branch (or a name typed in **Other**) | `git switch -c <name> <start branch>` | Same question as above. |
-| Create a worktree | New branch: `git worktree add ../<repo folder>-<ticket key> -b <name> <start branch>`. Existing branch: `git worktree add ../<repo folder>-<ticket key> <branch>` | Leave them where they are. Tell the user they stay in the current folder and are not in the worktree. |
-| Current branch | none | Carry on; they become part of this ticket's work. Say so. |
+| Switch to existing branch | `git switch <branch>`, then `git pull --ff-only` | Ask first — Stop so I can commit or stash them (Recommended), Carry them over, Retry previous answer. If git refuses, stop and tell the user. |
+| Create a branch (or a name typed in **Other**) | `git switch -c <name> --no-track origin/<start branch>` (starts from the freshly fetched start branch; use the local `<start branch>` only if it has no remote copy) | Same question as above. |
+| Create a worktree | New branch: `git worktree add ../<repo folder>-<ticket key> -b <name> --no-track origin/<start branch>`. Existing branch: `git worktree add ../<repo folder>-<ticket key> <branch>`, then `git pull --ff-only` inside it | Leave them where they are. Tell the user they stay in the current folder and are not in the worktree. |
+| Current branch | `git pull --ff-only` | Carry on; they become part of this ticket's work. Say so. |
 
 **Worktree:** do every later step inside the worktree folder. Give team agents the worktree path as the repo root. Install dependencies there first with the install command from Step 3, since a new worktree has none.
 

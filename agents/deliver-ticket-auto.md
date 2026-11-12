@@ -113,6 +113,7 @@ Started: <date time> | Mode: headless / background subagent
 | `implement-ticket` | **Plan** | Build it. |
 | `implement-ticket` | **Where should I work?** | Switch to the ticket's existing branch, else create the suggested branch. |
 | `implement-ticket` | Uncommitted changes when switching | Stop. |
+| `implement-ticket` | **Couldn't get the latest code. What now?** | Stop — never build on stale code unattended. |
 | `implement-ticket` | **Plan change** | The proposed change, if it stays inside the ticket's acceptance criteria; else keep to the plan and log it. |
 | `implement-ticket` | **Next step** | Skip — this agent commits in Stage 5. |
 | `write-unit-tests` | **Which files to test?** (more than 15) | Files with the most changed logic. |

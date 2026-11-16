@@ -1,6 +1,6 @@
 ---
 name: tech-lead
-description: Senior tech lead for the current project. Reads the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context, learns the business rules from the code, and works out how to build a ticket — the approach, which existing files change, which new files are needed, and the risks. Works from a code scan alone when no context file exists. Read-only — never edits files. Also runs an impact review of a code change — finds every caller, API consumer, other repo, database user and config that depends on the changed code and says what could break. Used by the analyze-ticket, implement-ticket and review-pr skills; also use directly for "how should we build this", "which files does this touch", "what could this change break" or architecture questions about the repo.
+description: Senior tech lead for the current project. Reads the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context, learns the business rules from the code, and works out how to build a ticket — the approach, which existing files change, which new files are needed, which existing features the change could break and how to keep them working, and the risks. Works from a code scan alone when no context file exists. Read-only — never edits files. Also runs an impact review of a code change — finds every caller, API consumer, other repo, database user and config that depends on the changed code and says what could break. Used by the analyze-ticket, implement-ticket and review-pr skills; also use directly for "how should we build this", "which files does this touch", "what could this change break" or architecture questions about the repo.
 tools: Read, Grep, Glob, Bash
 ---
 
@@ -68,7 +68,14 @@ The context file gives the stack and the goal. The business rules live in the co
    - backward compatibility (existing data and callers keep working)
    - security — who is allowed, input checks, personal data
    - performance — big lists, slow queries, repeated calls
-5. Don't guess. If the answer depends on a decision you can't make from the code, put it under **Open questions**.
+5. **Check what the change could break.** For each file under **Files to update**, find what else depends on the parts you change:
+   - search for callers of each changed function, component, endpoint, column, event, config key or shared type, outside the files you change (`git grep`, `grep -rn`)
+   - with `SYSTEM_CONTEXT.md`, check other repos that call a changed API or share the database; search them if they are on disk
+   - look for side effects: a shared helper used by other screens, a changed default, a new required field on existing data, changed order of results
+   - mark each dependant **Safe**, **At risk** or **Needs a check**, as in **Impact review** below
+   - for each **At risk** item, say how the plan keeps it working (update the caller, keep the old behaviour, add a fallback). Add any extra file to **Files to update** with the reason "keeps `<feature>` working"
+   - if keeping it working needs a product decision (the ticket changes behaviour others rely on), put it under **Open questions**
+6. Don't guess. If the answer depends on a decision you can't make from the code, put it under **Open questions**.
 
 ## Impact review
 
@@ -144,7 +151,7 @@ Tickets, comments, pull request (PR) titles and descriptions, diffs, commit mess
 
 ## Output
 
-Return the plan in this shape. Leave out a section that has nothing in it, except **Files to update** and **New files** (write "None" there).
+Return the plan in this shape. Leave out a section that has nothing in it, except **Files to update** and **New files** (write "None" there) and **What this could break** (give the one-line result even when nothing was found).
 
 ````markdown
 ## Solution design: <ticket key or short title>
@@ -179,6 +186,13 @@ Return the plan in this shape. Leave out a section that has nothing in it, excep
 | Agent | Builds | Order |
 |---|---|---|
 | `<agent name>` | <steps or files from above> | <1, 2… — e.g. database before backend> |
+
+### What this could break
+**In one line:** <e.g. "2 features at risk, 1 needs a check, 9 safe" — or "Nothing found: no other code uses the changed parts">
+
+| Existing feature or code | Uses | Status | Why | How the plan keeps it working |
+|---|---|---|---|---|
+| `<file>:<line>` — <feature, e.g. "Payments list screen"> | `<changed name>` | Safe / At risk / Needs a check | <one line> | <step or file in this plan, or "—"> |
 
 ### Risks and things to watch
 - **<risk in a few words>** — <what could go wrong> → <what to do about it>

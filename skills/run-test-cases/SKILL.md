@@ -1,6 +1,6 @@
 ---
-name: run-test-report
-description: Run a repo's test suites — unit tests and feature tests (end-to-end browser tests and API or integration tests), for the frontend, the backend, or both — and build a pass/fail report. Finds the test commands from PROJECT_CONTEXT.md, the manifest scripts, test config files or CI files, shows a run plan (exact commands, what it starts, rough time) for approval, asks before starting any app, server or container, and never runs against production. Saves the raw results in a temporary folder, then reports totals per suite, every failing test with its file, first error line and likely cause (test problem, app bug, environment, or flaky), slow tests, and coverage when a coverage command exists. Can compare against the base branch to split new failures from ones that were already failing. Shows the report for approval, then asks where to save it: a Markdown (.md) or Excel (.xlsx) file in docs/test-runs/, SharePoint, OneDrive, Google Drive, a Confluence page, or a comment on a Jira ticket. The first answer is saved in PROJECT_CONTEXT.md and offered first on later runs. Use when the user says "run all the tests", "run unit and feature tests and give me a report", "test report for this branch", "are the tests green", "run the test suite", or runs /ai-sam:run-test-report [unit | feature | all] [filter]. Read-only on code: never fixes, skips or changes a test or source file, and never uploads or posts without showing it first.
+name: run-test-cases
+description: Run a repo's test suites — unit tests and feature tests (end-to-end browser tests and API or integration tests), for the frontend, the backend, or both — and build a pass/fail report. Finds the test commands from PROJECT_CONTEXT.md, the manifest scripts, test config files or CI files, shows a run plan (exact commands, what it starts, rough time) for approval, asks before starting any app, server or container, and never runs against production. Saves the raw results in a temporary folder, then reports totals per suite, every failing test with its file, first error line and likely cause (test problem, app bug, environment, or flaky), slow tests, and coverage when a coverage command exists. Can compare against the base branch to split new failures from ones that were already failing. Shows the report for approval, then asks where to save it: a Markdown (.md) or Excel (.xlsx) file in docs/test-runs/, SharePoint, OneDrive, Google Drive, a Confluence page, or a comment on a Jira ticket. The first answer is saved in PROJECT_CONTEXT.md and offered first on later runs. Use when the user says "run all the tests", "run unit and feature tests and give me a report", "test report for this branch", "are the tests green", "run the test suite", or runs /ai-sam:run-test-cases [unit | feature | all] [filter]. Read-only on code: never fixes, skips or changes a test or source file, and never uploads or posts without showing it first.
 ---
 
 # Run Test Report
@@ -14,15 +14,15 @@ Run the repo's tests and report the results, so a developer, QA or manager knows
 
 Pick what to run:
 
-- **All** — unit and feature tests. Used when nothing is given, e.g. `/ai-sam:run-test-report`.
-- **Unit** or **Feature** only — e.g. `/ai-sam:run-test-report unit`.
-- **A filter** — a folder, file, tag or test name, e.g. `/ai-sam:run-test-report feature checkout`.
+- **All** — unit and feature tests. Used when nothing is given, e.g. `/ai-sam:run-test-cases`.
+- **Unit** or **Feature** only — e.g. `/ai-sam:run-test-cases unit`.
+- **A filter** — a folder, file, tag or test name, e.g. `/ai-sam:run-test-cases feature checkout`.
 
 Where it fits:
 
 1. `/ai-sam:write-unit-tests` and `/ai-sam:write-feature-tests` — write tests and run the ones they wrote.
 2. `/ai-sam:smoke-regression-report` — which tickets in a release QA should test first. Does not run tests.
-3. `/ai-sam:run-test-report` — runs the whole suite and reports the results. (This skill.)
+3. `/ai-sam:run-test-cases` — runs the whole suite and reports the results. (This skill.)
 
 ## Ground rules
 
@@ -228,7 +228,7 @@ Show it in the chat:
 2. `<test command>` for each suite
 
 ### Next steps
-- <e.g. "Fix 2 app bugs in `OrderService` — then re-run `/ai-sam:run-test-report feature`">
+- <e.g. "Fix 2 app bugs in `OrderService` — then re-run `/ai-sam:run-test-cases feature`">
 - <e.g. "Repair the outdated test with `/ai-sam:write-feature-tests ABC-123`">
 ````
 
@@ -316,7 +316,7 @@ Only when a repo file was picked:
 1. Create the folder if missing (`mkdir -p docs/test-runs/`).
 2. Keep it out of git — the report is a working note, not code:
    - If `git check-ignore -q <folder>/x.md` says it is already ignored, do nothing.
-   - Otherwise add the folder on its own line at the end of the repo root `.gitignore`, under `# Test run reports from ai-sam run-test-report`. Create `.gitignore` if missing. Don't change any other line.
+   - Otherwise add the folder on its own line at the end of the repo root `.gitignore`, under `# Test run reports from ai-sam run-test-cases`. Create `.gitignore` if missing. Don't change any other line.
 3. Say in one line what was created and added.
 
 ### 8b — Markdown file
@@ -367,7 +367,7 @@ Show a short report in the chat:
 - Confluence — <link>
 - Jira comment on <key> — <link>
 
-**Next step:** <e.g. "Fix the 2 app bugs, then re-run `/ai-sam:run-test-report feature`">
+**Next step:** <e.g. "Fix the 2 app bugs, then re-run `/ai-sam:run-test-cases feature`">
 ````
 
 Leave out lines that don't apply. Add a line if `.gitignore`, `PROJECT_CONTEXT.md` or `CLAUDE.md` was changed — those changes are uncommitted. Never commit or push anything.

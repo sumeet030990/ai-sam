@@ -6,15 +6,29 @@ End to end workflow skills for any projects you work on, packaged as a Claude Co
 
 Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for every ticket or release.
 
-| Step | Stage | Skills |
-| --- | --- | --- |
-| 1 | Set up (once per repo or team) | `create-project-context`, `setup-release-process`, `setup-ticket-config`, `create-team` |
-| 2 | Write and check the ticket | `create-ticket`, `analyze-ticket` |
-| 3 | Build | `implement-ticket` |
-| 4 | Test | `write-unit-tests`, `write-feature-tests`, `write-qa-test-cases`, `run-test-report` |
-| 5 | Review and fix feedback | `review-pr`, `fix-comments` |
-| 6 | Release and schedule | `smoke-regression-report`, `schedule-tests` |
-| 7 | Track the sprint (daily, for project managers) | `pm-daily-brief` |
+<table>
+  <thead>
+    <tr><th>Step</th><th>Stage</th><th>Skills</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td rowspan="4">1</td><td rowspan="4">Set up (once per repo or team)</td><td><code>create-project-context</code></td><td>Save your project's details, tech stack and commands in <code>PROJECT_CONTEXT.md</code>.</td></tr>
+    <tr><td><code>setup-release-process</code></td><td>Save how your team plans, tests and ships work (sprints, releases, environments).</td></tr>
+    <tr><td><code>setup-ticket-config</code></td><td>Save your team's ticket rules and templates.</td></tr>
+    <tr><td><code>create-team</code></td><td>Create helper agents for each part of the code (frontend, backend, database and so on).</td></tr>
+    <tr><td rowspan="2">2</td><td>Write the ticket</td><td><code>create-ticket</code></td><td>Write a clear ticket in plain English, in the right format for its type.</td></tr>
+    <tr><td>Check the ticket</td><td><code>analyze-ticket</code></td><td>Check if the ticket is ready to build and plan how to build it.</td></tr>
+    <tr><td>3</td><td>Build</td><td><code>implement-ticket</code></td><td>Write the code for the ticket on a new branch, end to end.</td></tr>
+    <tr><td rowspan="4">4</td><td rowspan="3">Write tests</td><td><code>write-unit-tests</code></td><td>Write unit tests for changed code or a file you name.</td></tr>
+    <tr><td><code>write-feature-tests</code></td><td>Write end-to-end browser tests and API tests for a feature.</td></tr>
+    <tr><td><code>write-qa-test-cases</code></td><td>Write step-by-step manual test cases for testers.</td></tr>
+    <tr><td>Run tests</td><td><code>run-test-cases</code></td><td>Run the repo's tests and give a pass/fail report.</td></tr>
+    <tr><td rowspan="2">5</td><td rowspan="2">Review and fix feedback</td><td><code>review-pr</code></td><td>Review code changes before merge for bugs and missing cases.</td></tr>
+    <tr><td><code>fix-comments</code></td><td>Work through open ticket and pull request comments and fix them.</td></tr>
+    <tr><td rowspan="2">6</td><td>Release</td><td><code>smoke-regression-report</code></td><td>Sort each ticket in a release into smoke test, regression test or skip.</td></tr>
+    <tr><td>Schedule</td><td><code>schedule-tests</code></td><td>Run all the repo's checks automatically at a set time.</td></tr>
+    <tr><td>7</td><td>Track the sprint (daily, for project managers)</td><td><code>pm-daily-brief</code></td><td>Give a daily sprint summary: on track or not, risks and blockers.</td></tr>
+  </tbody>
+</table>
 
 All skills write in short, point-wise, plain English, so a junior developer or a manager can follow the results.
 
@@ -189,7 +203,7 @@ Writes manual test cases (step-by-step checks a tester follows by hand). Writes 
 
 - **Never** posts to a ticket or creates items without showing them first.
 
-#### 4.4 `/ai-sam:run-test-report [unit | feature | all] [filter]`
+#### 4.4 `/ai-sam:run-test-cases [unit | feature | all] [filter]`
 
 Runs the repo's test suites now and reports the results.
 
@@ -328,7 +342,7 @@ Gives the project manager (PM) a short morning brief for the active sprint, from
 
 ## Subagents
 
-- `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `analyze-ticket`, `implement-ticket` and `review-pr`. It learns the project from the context files and the business rules from the code, then works out which files change. For `review-pr` it runs an impact review: who depends on the changed code and what could break. When the repo has a team from `create-team`, it says which agent builds each part. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
+- `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `analyze-ticket`, `implement-ticket` and `review-pr`. It learns the project from the context files and the business rules from the code, then works out which files change and which existing features the change could break. For `review-pr`, and for `implement-ticket` after the build, it runs an impact review: who depends on the changed code and what could break. When the repo has a team from `create-team`, it says which agent builds each part. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
 - `deliver-ticket` (`ai-sam:deliver-ticket`) — takes one ticket from analysis to a reviewed pull request (PR) in one session, and posts each stage's result on the ticket.
   - **Start it:** `claude --agent ai-sam:deliver-ticket`, then give the ticket key (e.g. `deliver ABC-123`).
   - **Why a separate session:** the skills ask you questions and start `tech-lead`. A subagent can do neither, so this agent must be the main session.

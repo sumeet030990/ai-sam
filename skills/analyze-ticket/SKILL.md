@@ -1,6 +1,6 @@
 ---
 name: analyze-ticket
-description: Act as the project's senior tech lead on a Jira ticket (story, bug, task, epic or spike) — check whether it is ready for development and design how to build it, in one run. Gives a Ready / Needs small fixes / Not ready verdict with the gaps and the questions for the product owner, then a build plan — the approach, which existing files need updating, which new files are needed and where, which file delivers each acceptance criterion, tests, risks and open questions. Checks the ticket against the team's TICKET_CONFIG.md when one exists. Uses the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context and the tech-lead subagent, and still works from a code scan alone when no context file exists. Shows everything in the chat in short, plain English a junior developer or manager can follow. Use when the user says "analyze this ticket", "is this ticket ready", "review this story", "refine this ticket", "what's missing in this ticket", "grooming", "sprint planning check", "design a solution", "how should we build this ticket", "which files need to change", "what files do I need to create", "plan this story", "tech lead review of this ticket", or pastes a ticket and asks what's wrong with it or how to implement it. Once the report is approved, asks whether to post it as a comment on the ticket on the team's board (from TICKET_CONFIG.md), save it as a Markdown file, or keep it in the chat. Never writes code, and never edits a ticket's fields or status.
+description: Act as the project's senior tech lead on a Jira ticket (story, bug, task, epic or spike) — check whether it is ready for development and design how to build it, in one run. Gives a Ready / Needs small fixes / Not ready verdict with the gaps and the questions for the product owner, then a build plan — the approach, which existing files need updating, which new files are needed and where, which file delivers each acceptance criterion, which existing features the change could break (flagged as gaps or questions when the ticket doesn't cover them), tests, risks and open questions. Checks the ticket against the team's TICKET_CONFIG.md when one exists. Uses the PROJECT_CONTEXT.md and SYSTEM_CONTEXT.md written by create-project-context and the tech-lead subagent, and still works from a code scan alone when no context file exists. Shows everything in the chat in short, plain English a junior developer or manager can follow. Use when the user says "analyze this ticket", "is this ticket ready", "review this story", "refine this ticket", "what's missing in this ticket", "grooming", "sprint planning check", "design a solution", "how should we build this ticket", "which files need to change", "what files do I need to create", "plan this story", "tech lead review of this ticket", or pastes a ticket and asks what's wrong with it or how to implement it. Once the report is approved, asks whether to post it as a comment on the ticket on the team's board (from TICKET_CONFIG.md), save it as a Markdown file, or keep it in the chat. Never writes code, and never edits a ticket's fields or status.
 ---
 
 # Analyze Ticket
@@ -125,8 +125,17 @@ Start the `tech-lead` subagent (`ai-sam:tech-lead`). Give it:
 - the full ticket text, and the user's answers from Step 5
 - the repo root(s) to look in
 - the context file paths found in Step 2, or "none found"
+- this ask: "Check which existing features the change could break, and fill in **What this could break**."
 
 Wait for its plan. A gap the code reveals (for example, the ticket names a screen that doesn't exist) goes under **Gaps to fix**, and may change the verdict.
+
+**Flag what could break.** Read the plan's **What this could break**:
+
+- **At risk, and the plan keeps it working** — leave it in the plan. No gap.
+- **At risk, and keeping it working needs a decision** (the ticket changes behaviour another feature relies on) — add it under **Gaps to fix** and **Questions to ask**. The verdict is at least **Needs small fixes**.
+- **At risk with no fix in the plan** — send the plan back to the subagent once to add a fix. If there is still none, treat it as a gap.
+- **Needs a check** — add it under **Questions to ask**, naming who can check (another team, QA, ops).
+- **Ticket doesn't mention a feature it breaks** — add a gap: the ticket should say whether that feature must keep working (a regression risk, meaning an old feature that stops working after a change).
 
 ## Step 7 — Check and show the report
 
@@ -134,6 +143,7 @@ Wait for its plan. A gap the code reveals (for example, the ticket names a scree
    - Every file under **Files to update** exists.
    - Every file under **New files** sits in a folder that exists or follows the codebase's layout.
    - Every acceptance criterion appears in **Acceptance criteria → where each is built**.
+   - **What this could break** is there. Open 1–2 of the dependants it lists and confirm the status. Run one `git grep` for a changed name the plan marks as unused; if it finds callers, the check is incomplete.
 
    Fix small slips yourself. If the plan misses something big, send it back to the subagent with what is wrong.
 2. Show the readiness check, then the plan as the subagent returned it:
@@ -144,6 +154,7 @@ Wait for its plan. A gap the code reveals (for example, the ticket names a scree
 **Verdict:** Ready / Needs small fixes / Not ready — <one-line reason>
 **Size:** Small / Medium / Large — <one-line reason, from the plan>
 **Based on:** <context files read> | Code scan only
+**Could break:** <e.g. "2 existing features at risk (both handled in the plan), 1 needs a check" — or "Nothing found">
 **Target release:** <2.5.0 — code freeze Tue 8 Dec (12 working days left), release Tue 15 Dec. Fits / Tight / Won't fit before freeze — <one-line reason from the plan's size>. Leave out when there is no release section.>
 
 ### What's clear
@@ -205,10 +216,10 @@ Ask — **Where should this report go?** (multi-select). Mark as (Recommended) t
 1. **Check for personal or secret data again** (see **Ground rules**). The comment is seen by everyone with access to the ticket.
 2. **Build the comment** in the tracker's format: Jira — Markdown if the tool takes it, else the connector's own format; Azure DevOps — HTML, with `<`, `>`, `&` and `"` escaped in the text; GitHub and GitLab — Markdown.
    - Start with `Ticket analysis (ai-sam) — <Verdict> — <Size>`.
-   - Then **Gaps to fix**, **Questions to ask**, and the solution design.
+   - Then **Gaps to fix**, **Questions to ask**, **What this could break**, and the solution design.
    - If a file was also saved, add its path at the end.
    - Never add an image or link to an outside URL that didn't come from the user.
-3. **If it is too long** (Jira and Azure DevOps comments start failing around 32,000 characters), post the verdict, gaps, questions and the list of files to change, and say the full report is in the saved file.
+3. **If it is too long** (Jira and Azure DevOps comments start failing around 32,000 characters), post the verdict, gaps, questions, the **At risk** and **Needs a check** rows, and the list of files to change, and say the full report is in the saved file.
 4. **Show the exact comment and the ticket it goes to.** Ask — **Post this comment on `<KEY>`?**: Post it (Recommended), Change the text, Retry previous answer. Post only on yes.
 5. **Shell commands** (`az`, `gh`, `glab`): never put the comment straight on the command line. Write it to a temporary file outside the repo, pass it as `"$(cat <file>)"` or `--body-file <file>`, then delete the file.
 6. **After posting**, give the comment link if the tool returns one. If posting fails, show the error in one line and offer to save as a Markdown file instead.

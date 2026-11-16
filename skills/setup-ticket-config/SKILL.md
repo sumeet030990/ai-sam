@@ -161,7 +161,12 @@ A custom template **fully replaces** the standard one for that ticket type. Type
 Where the team logs its tickets. `/ai-sam:create-ticket` creates tickets here, and `/ai-sam:analyze-ticket` posts its report here. Never ask for or save passwords, tokens or any other credential — only where tickets go.
 
 1. Ask **Where does the team log tickets?**: the tracker the repo points to (Recommended — a Jira key in recent commit messages or branch names suggests Jira; an `azure.com` remote suggests Azure DevOps; a `github.com` or GitLab remote suggests GitHub or GitLab), one or two others from Jira, Azure DevOps, GitHub issues, GitLab issues, Retry previous answer. Bitbucket teams usually log tickets in Jira — say so. Say the user can type another tracker in **Other**, or **Skip** to leave this section out.
-2. Ask for the details that tracker needs, in one call. If the tracker is connected (see the table), list the real projects, boards or teams as options; otherwise suggest values from the repo:
+2. **Confirm the connection.** Check whether the picked tracker is connected, using the **Connected when** check in the table below. Skip this for **Other**.
+   - Tell the user first, in one line: "`/ai-sam:create-ticket` and `/ai-sam:analyze-ticket` will use this board to read tickets, create tickets and post reports."
+   - **Connected:** say so, naming the account or organization if the check shows it.
+   - **Not connected:** say which check failed and how to connect (Jira: add the Atlassian connector; Azure DevOps: `az login` and `az extension add --name azure-devops`; GitHub: `gh auth login`; GitLab: `glab auth login`). Never ask for or handle passwords or tokens.
+   - Then ask **Are you connected to this board?**: **Yes, check again (Recommended)** (re-run the check), **Not now — save the board anyway** (tickets will be pasted in by hand until connected), **Pick a different tracker** (back to step 1).
+3. Ask for the details that tracker needs, in one call. If the tracker is connected (see the table), list the real projects, boards or teams as options; otherwise suggest values from the repo:
 
    | Tracker | Connected when | Details to ask |
    |---|---|---|
@@ -171,10 +176,10 @@ Where the team logs its tickets. `/ai-sam:create-ticket` creates tickets here, a
    | GitLab | `glab auth status` succeeds | Project as `group/name` (default: this repo's remote) |
    | Other | — | Board link. Tickets are pasted in by hand |
 
-3. Ask, in one call:
+4. Ask, in one call:
    - **Default labels or components for new tickets** (optional) — suggest any the project already uses; **None** (Recommended when unsure).
    - **Where should analyze-ticket reports go by default?**: Comment on the ticket (Recommended), Markdown file in the repo, Ask each time.
-4. Show the section in a `preview` and ask: **Looks good (Recommended)**, **Retry with edits**, **Retry previous answer**.
+5. Show the section in a `preview` and ask: **Looks good (Recommended)**, **Retry with edits**, **Retry previous answer**.
 
 ## Step 5 — Confirm and write
 

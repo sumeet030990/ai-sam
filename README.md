@@ -32,7 +32,17 @@ Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for 
 
 All skills write in short, point-wise, plain English, so a junior developer or a manager can follow the results.
 
+### Agents and the skills they use
+
+| Agent | How to start it | Skills it uses |
+|---|---|---|
+| [`setup-project`](#subagents) | `claude --agent ai-sam:setup-project` | `create-project-context`, `setup-release-process`, `setup-ticket-config`, `create-team` (only the parts your role needs) |
+| [`deliver-ticket`](#subagents) | `claude --agent ai-sam:deliver-ticket` | `analyze-ticket`, `implement-ticket`, `write-unit-tests`, `write-feature-tests`, `review-pr` |
+| [`deliver-ticket-auto`](#subagents) | `claude -p "deliver ABC-123" --agent ai-sam:deliver-ticket-auto` | Same as `deliver-ticket`, with no questions |
+
 ### Step 1 — Set up (run once)
+
+**Quick way:** run all four set-up skills in one go with the [`setup-project`](#subagents) agent: `claude --agent ai-sam:setup-project`. It asks your role first and skips the questions your role doesn't need.
 
 #### 1.1 `/ai-sam:create-project-context`
 
@@ -343,6 +353,36 @@ Gives the project manager (PM) a short morning brief for the active sprint, from
 ## Subagents
 
 - `tech-lead` (`ai-sam:tech-lead`) — the senior tech lead behind `analyze-ticket`, `implement-ticket` and `review-pr`. It learns the project from the context files and the business rules from the code, then works out which files change and which existing features the change could break. For `review-pr`, and for `implement-ticket` after the build, it runs an impact review: who depends on the changed code and what could break. When the repo has a team from `create-team`, it says which agent builds each part. Other skills, or you directly, can hand it a ticket or an architecture question. Read-only.
+- `setup-project` (`ai-sam:setup-project`) — runs the four set-up skills one after another, in one session, and asks only what your role needs.
+  - **Start it:** `claude --agent ai-sam:setup-project`.
+  - **Why a separate session:** the skills ask you questions, and a subagent can't. So this agent must be the main session.
+  - **First question:** your role. Pick one or more: Developer, QA / tester, Project manager / Scrum master, Product owner / business analyst.
+  - **Order:** `create-project-context` → `setup-release-process` → `setup-ticket-config` → `create-team`. Each skill finishes before the next starts.
+  - **What each role is asked:**
+
+    | Set-up part | Dev | QA | PM | PO |
+    |---|---|---|---|---|
+    | Project basics | ✓ | ✓ | ✓ | ✓ |
+    | Tech stack | ✓ | ✓ | | |
+    | Dependency files (package versions) | ✓ | | | |
+    | Install, run and test commands | ✓ | ✓ | | |
+    | Lint and build commands | ✓ | | | |
+    | Delivery method and sprint ceremonies | | | ✓ | ✓ |
+    | Release schedules and releases | | ✓ | ✓ | ✓ |
+    | Environments and branches | ✓ | ✓ | | |
+    | Deployment | ✓ | | | |
+    | Code freeze and deadlines | ✓ | ✓ | ✓ | |
+    | Hotfixes | ✓ | ✓ | | |
+    | Release checklist | | ✓ | ✓ | |
+    | Jira link for sprints and releases | | | ✓ | |
+    | Ticket format and templates | | ✓ | ✓ | ✓ |
+    | Ticket board | ✓ | ✓ | ✓ | ✓ |
+    | Builder agents (`create-team`) | ✓ | QA agent only | | |
+
+    - Example: a QA-only user doesn't run `analyze-ticket` or `implement-ticket`, so isn't asked about package versions, deployment or builder agents.
+  - **Before it starts:** shows a checklist of what will run and what is skipped. You can add skipped parts back.
+  - **No repeat questions:** your name (if you choose to record it) and the context file path are asked once and reused.
+  - **Add a role later:** run it again and pick the new role. Existing files are updated, not replaced.
 - `deliver-ticket` (`ai-sam:deliver-ticket`) — takes one ticket from analysis to a reviewed pull request (PR) in one session, and posts each stage's result on the ticket.
   - **Start it:** `claude --agent ai-sam:deliver-ticket`, then give the ticket key (e.g. `deliver ABC-123`).
   - **Why a separate session:** the skills ask you questions and start `tech-lead`. A subagent can do neither, so this agent must be the main session.

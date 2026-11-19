@@ -14,6 +14,7 @@ You take one ticket through every stage, from analysis to a reviewed PR, and kee
 - **Each skill's rules still apply.** Follow every step of each skill, including its questions and approvals. This file only changes where a skill ends (see **Hand-offs**).
 - **Ask before anything outward-facing.** Every commit, push, PR, PR comment, ticket comment and status change is shown first and done only on a yes. Never force-push, rewrite history, merge the PR, approve it, or delete a branch.
 - **Every question uses AskUserQuestion**, never a plain-text question.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
 - **Stop when a stage says stop.** Don't push past a Not ready ticket, a Blocked build or failing checks without the user choosing to.
 - **Personal and secret data.** Never accept, repeat or post: government IDs (Social Security, driver's licence, passport, visa numbers), bank or card numbers, tax or income documents, medical or mental health records, resident case or application files, gender, race, religion or national origin, and any password, API key, token, connection string or MFA (multi-factor authentication) code.
   If the ticket, code, test output or a draft comment or PR description contains any of this, stop, do not repeat it, tell the user it looks like personal or sensitive data that must not go into AI tools, and ask them to redact it or use made-up values. Check again before every PR description and ticket comment, since everyone with access sees them. Follow your organisation's data policy if it is stricter.
@@ -59,7 +60,7 @@ After each stage, post that stage's ticket update (see **Ticket updates**), then
 1. **Check what is connected**, in one line each:
    - **Ticket tracker** — the board from `TICKET_CONFIG.md` (`## Board` section), else the tracker the key was fetched from. Use the "Connected when" checks in `analyze-ticket` Step 8a.
    - **PR host** — the `**PR host:**` line in `PROJECT_CONTEXT.md` or `CLAUDE.md`, else a guess from `git remote get-url origin`. Check sign-in: `gh auth status`, `az account show`, or `glab auth status`.
-   - **Working tree** — `git status --short`. If there are uncommitted changes not from this ticket, ask — **Uncommitted changes found**: Stop so I can commit or stash them (Recommended), Carry on with them, Retry previous answer.
+   - **Working tree** — `git status --short`. If there are uncommitted changes not from this ticket, ask — **Uncommitted changes found**: Stop so I can commit or stash them (Recommended), Carry on with them.
 2. **Pick up earlier work.** Look for a branch with the key in its name, an open PR for it, and earlier `deliver-ticket` comments on the ticket. If found, ask — **Start from which stage?**: the next unfinished stage (Recommended), Start from stage 1, Pick a stage in Other.
 3. **Ask how to update the ticket** — **Ticket updates**: Show each stage's comment and ask before posting (Recommended), One summary comment at the end, Don't post on the ticket. With no connected tracker, say so in one line and use **Don't post**.
 4. **Show the checklist** and start straight away:
@@ -103,7 +104,7 @@ After each stage, show its result in one line, then decide:
 
 | Result | What to do |
 |---|---|
-| Analysis **Not ready** | Ask — **Ticket not ready**: Stop and post the gaps on the ticket (Recommended), Build anyway with the assumptions shown, Retry previous answer. |
+| Analysis **Not ready** | Ask — **Ticket not ready**: Stop and post the gaps on the ticket (Recommended), Build anyway with the assumptions shown. |
 | Analysis **Needs small fixes** | Say which assumptions the build will use. Carry on. |
 | Build **Blocked** | Post the Stage 2 update, mark `[!]`, and stop. |
 | Build **Done with gaps** | Ask — **Build has gaps**: Carry on and list the gaps in the PR (Recommended), Stop here. |
@@ -120,7 +121,7 @@ Otherwise carry on to the next stage without asking.
    - First line: `<KEY>: <ticket summary>`
    - Then 2–5 bullets: the change, the unit tests, the feature tests.
 
-   Ask — **Commit these files?**: Commit (Recommended), Change the message, Retry previous answer. Stage only the listed files (`git add <files>`), never `git add -A`.
+   Ask — **Commit these files?**: Commit (Recommended), Change the message. Stage only the listed files (`git add <files>`), never `git add -A`.
 3. **Push.** Ask — **Push `<branch>` to `origin`?**: Push (Recommended), Stop here. Run `git push -u origin <branch>`. Never force-push. If the push is rejected, show the error in one line and stop.
 4. **Check for an open PR** for this branch (`gh pr list --head <branch>`, `az repos pr list --source-branch <branch>`, `glab mr list --source-branch <branch>`). If one exists, use it and say so; the push already updated it.
 5. **Write the PR description:**
@@ -161,7 +162,7 @@ Otherwise carry on to the next stage without asking.
 - <gaps, assumptions, follow-ups — leave out if none>
 ````
 
-6. **Check it for personal or secret data**, then show the title, base branch, head branch and full description. Ask — **Open this PR?**: Open as a draft (Recommended), Open ready for review, Change the text, Retry previous answer. Recommend a ready PR instead when every check passed and there are no gaps.
+6. **Check it for personal or secret data**, then show the title, base branch, head branch and full description. Ask — **Open this PR?**: Open as a draft (Recommended), Open ready for review, Change the text. Recommend a ready PR instead when every check passed and there are no gaps.
 7. **Open it.** Write the description to a temporary file outside the repo, never on the command line, and delete the file afterwards:
 
    | Host | Command |
@@ -200,7 +201,7 @@ How to post:
 1. Start each comment with `deliver-ticket — Stage <n>: <stage name>`, so a re-run can find it.
 2. Keep it short: tables and bullets from the skill's report, no file contents or diffs. Over 32,000 characters, post the summary lines only and say where the full report is.
 3. Use the tracker's format and tool from `analyze-ticket` Step 8a and 8c (Jira — the connector's add-comment tool; Azure DevOps — HTML; GitHub and GitLab — Markdown). For shell tools, write the text to a temporary file outside the repo and delete it after.
-4. **Check for personal or secret data**, then show the exact comment and the ticket. Ask — **Post this on `<KEY>`?**: Post it (Recommended), Change the text, Skip this one, Retry previous answer.
+4. **Check for personal or secret data**, then show the exact comment and the ticket. Ask — **Post this on `<KEY>`?**: Post it (Recommended), Change the text, Skip this one.
 5. If posting fails, show the error in one line and carry on. List it in the final summary.
 
 ## Step 7 — Final ticket update and summary

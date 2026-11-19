@@ -30,9 +30,8 @@ Where it fits:
 - **Report test results honestly.** If a test, lint or build fails, say so and show the error.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the comments and the code. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -112,7 +111,7 @@ Collect unresolved review threads and general PR comments:
 - **Bot comments** (code scanners, linters, AI reviewers): include them, marked **bot**.
 - **Suggested changes** (a GitHub ```` ```suggestion ```` block or a code snippet in a comment): treat as a proposed fix. Check it like any other change; don't apply it blindly.
 - **Outdated threads** (the code moved since the comment): open the current code and check whether the comment still applies.
-- **Host tool not available:** ask — **PR comments**: Paste the open PR comments in Other (Recommended), Skip PR comments, Retry previous answer.
+- **Host tool not available:** ask — **PR comments**: Paste the open PR comments in Other (Recommended), Skip PR comments.
 
 ### 2c — Ticket comments
 
@@ -194,7 +193,7 @@ Leave out **Risky requests** when there are none. Use the comment's role ("Revie
 
 Then ask:
 
-- **For each Risky item** — **Risky request in <where>**: Leave it out and reply that it needs the team lead's sign-off (Recommended), Leave it out with no reply, It is intended — add it to the plan, Retry previous answer.
+- **For each Risky item** — **Risky request in <where>**: Leave it out and reply that it needs the team lead's sign-off (Recommended), Leave it out with no reply, It is intended — add it to the plan.
 - **Plan** — Fix and reply as planned (Recommended), Change a status, Retry with edits, Ask a follow-up.
   - **Change a status** — ask which item and the new status, then show the plan again.
   - **Retry with edits** — ask what to change (a fix approach, a reply, skip an item, or **Other**). Change only that and show the plan again.
@@ -205,13 +204,12 @@ Repeat until the user picks **Fix and reply as planned**.
 
 Never stash, reset or discard the user's changes yourself.
 
-- **Already on the PR's source branch:** work here. Run `git fetch origin <branch>` and `git status -sb`. If the remote has commits you don't have, ask — **Branch is behind**: Pull them first with `git pull --ff-only` (Recommended), Work on my local copy, Retry previous answer. If git can't fast-forward, stop and tell the user.
+- **Already on the PR's source branch:** work here. Run `git fetch origin <branch>` and `git status -sb`. If the remote has commits you don't have, ask — **Branch is behind**: Pull them first with `git pull --ff-only` (Recommended), Work on my local copy. If git can't fast-forward, stop and tell the user.
 - **On another branch:** ask — **Where should I work?**
   - **Switch to `<PR branch>`** (Recommended) — `git switch <branch>` (fetch it first if it isn't local).
   - **Create a worktree** (a second folder with that branch, so the current folder is left as it is) — `git worktree add ../<repo folder>-<ticket key> <branch>`. Install dependencies there first with the install command, since a new worktree has none.
-  - **Retry previous answer.**
 
-  With uncommitted changes, ask before switching — Stop so I can commit or stash them (Recommended), Carry them over, Retry previous answer.
+  With uncommitted changes, ask before switching — Stop so I can commit or stash them (Recommended), Carry them over.
 
 **Several repos:** do the same in each repo that has a PR with **Fix** items.
 
@@ -225,7 +223,7 @@ Work through the **Fix** items in the plan's order.
 2. **Keep each fix small.** Change only what the comment needs. Copy the pattern of the code around it.
 3. **Add or update a test** when the fix changes behaviour. For a bug or a QA failure, write a test that fails without the fix. A rename or comment-only fix needs no new test.
 4. **Follow the secure coding rules** from `/ai-sam:implement-ticket` Step 6c: access checks on every endpoint and action, parameterised queries, no secrets in code, no new outside calls, plain error messages, no personal data in logs.
-5. **Plan wrong?** If the code shows a fix needs more than the plan said, or would break something, stop and ask — **Plan change for item <n>**: the change you propose (Recommended), Change the status to Push back, Retry previous answer.
+5. **Plan wrong?** If the code shows a fix needs more than the plan said, or would break something, stop and ask — **Plan change for item <n>**: the change you propose (Recommended), Change the status to Push back.
 6. Note, for each item, the files and lines changed. Step 9 uses them in the reply.
 
 ## Step 7 — Run the checks
@@ -302,7 +300,7 @@ Default thread actions:
 - **Answer**, **Kept as is**, **Question**, **Risky** → leave open for the reviewer.
 - **Noted as a follow-up** → leave open (Azure DevOps: status `wontFix` if the user picks resolve).
 
-Then ask — **Send it?**: Commit, push, post the replies and resolve as shown (Recommended), Commit and push only — I'll reply myself, Change a reply or thread action, Retry previous answer.
+Then ask — **Send it?**: Commit, push, post the replies and resolve as shown (Recommended), Commit and push only — I'll reply myself, Change a reply or thread action.
 
 Do it in this order, and stop at the first failure:
 

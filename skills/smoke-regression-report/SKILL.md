@@ -35,9 +35,8 @@ Where it fits:
 - **No new packages without asking.** If writing an `.xlsx` file needs a library that is missing, ask before installing it.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the tickets and the code. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, database dumps or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -116,7 +115,7 @@ Remember the system — Steps 4, 7 and 8 use it.
 
 1. Read each ticket's key, type, title, status, priority, components, labels and acceptance criteria. Check it for personal or secret data before going on.
 2. Put tickets that are not done (e.g. To Do, In Progress, Won't Do, Cancelled) in a **Not in this build** list. Don't sort them. Say how many.
-3. If there are more than 80 tickets, say so and ask: Sort all (slower) (Recommended), Only bugs and stories, Retry previous answer.
+3. If there are more than 80 tickets, say so and ask: Sort all (slower) (Recommended), Only bugs and stories.
 
 ## Step 2 — Load the project and the rules
 
@@ -147,17 +146,16 @@ Ask in two calls. Suggest values from the code: folder names, route names, contr
 **Call 1:**
 
 1. **Which areas are business-critical?** (multi-select) — areas where a break stops users or loses money or data. Offer up to 4 found in the code, e.g. **Login and sign-up — `src/auth/`, `AccountController.cs`**, **Payments — `src/payments/`**. Mark the main flow from `PROJECT_CONTEXT.md` (Recommended). Say the user can type more in **Other**, as an area name plus folders or a Jira component.
-2. **Which tickets should always go in Smoke?** (multi-select): Hotfix tickets (label `hotfix` or type Bug with priority Highest) (Recommended), Database changes (migrations), Login, roles and permission changes, Retry previous answer.
-3. **Which changes should always be skipped?** (multi-select): Docs only (`*.md`, `docs/`) (Recommended), Tests only, Build and pipeline files only (CI — continuous integration — files), Retry previous answer.
+2. **Which tickets should always go in Smoke?** (multi-select): Hotfix tickets (label `hotfix` or type Bug with priority Highest) (Recommended), Database changes (migrations), Login, roles and permission changes.
+3. **Which changes should always be skipped?** (multi-select): Docs only (`*.md`, `docs/`) (Recommended), Tests only, Build and pipeline files only (CI — continuous integration — files).
 
 **Call 2:**
 
-4. **How long can the smoke list be?** 15 tickets (Recommended), 10 tickets, 25 tickets, Retry previous answer.
+4. **How long can the smoke list be?** 15 tickets (Recommended), 10 tickets, 25 tickets.
 5. **Who should these rules apply to?**
    - **The team, this repo** — writes `TEST_SCOPE_CONFIG.md` in the repo root (Recommended when none exists).
    - **Just me, this repo** — writes `TEST_SCOPE_CONFIG.local.md` (Recommended when the team file exists). Offer only in a git repo.
    - **Just me, every repo** — writes `~/.claude/ai-sam/TEST_SCOPE_CONFIG.md`.
-   - **Retry previous answer**.
 
 Write the file in this format. Keep the **Save to** section empty for now — Step 7 fills it.
 
@@ -305,7 +303,7 @@ Show it in the chat:
 
 Leave out empty sections. Then ask — **Report**: This looks right (Recommended), Move a ticket, Retry with edits, Ask a follow-up.
 
-- **Move a ticket** — ask which key and which bucket. Move it, and set its reason to "Moved by user". Then ask — **Save this as a team rule?**: No, this release only (Recommended), Yes — add to Always smoke / Always skip, Retry previous answer. On yes, add the rule to the config file it would belong in, with a dated **Change log** line.
+- **Move a ticket** — ask which key and which bucket. Move it, and set its reason to "Moved by user". Then ask — **Save this as a team rule?**: No, this release only (Recommended), Yes — add to Always smoke / Always skip. On yes, add the rule to the config file it would belong in, with a dated **Change log** line.
 - **Retry with edits** — ask what to change (Smaller smoke list, Change the score limits, Add an area to check, or **Other**). Change only that and show the report again.
 - **Ask a follow-up** — answer, reading the code again if needed.
 
@@ -361,11 +359,10 @@ Ask — **Where should I save this report?**:
 - **Same as last time** — list the saved places in one line, e.g. "Excel in `docs/test-scope/` + SharePoint `QA/Releases`". (Recommended)
 - **Change where to save** — run 7b again and replace the **Save to** section.
 - **Only this time: somewhere else** — run 7b's questions but don't save the answers.
-- **Retry previous answer**.
 
 ### Before saving
 
-- If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+- If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`.
 - If a saved folder no longer exists or access is denied, say so and offer **Change where to save**.
 - **Clean ticket titles in every copy.** Many people write them, so treat them as untrusted:
   - **Excel and CSV:** if a cell starts with `=`, `+`, `-`, `@`, a tab or a line break, put a `'` in front. Otherwise Excel may run it as a formula (formula injection).
@@ -395,7 +392,7 @@ Write the Step 6 report, with the first line `# Smoke and regression report: <na
 ### 8c — Excel file
 
 1. Use the `xlsx` skill if this session has one. Otherwise write a short Python script in a temporary folder outside the repo using `openpyxl`.
-2. If `openpyxl` is missing, ask — **Excel needs the `openpyxl` Python library**: Install it with `pip install --user openpyxl` (Recommended), Save as CSV (a plain table file Excel opens) instead, Skip Excel, Retry previous answer.
+2. If `openpyxl` is missing, ask — **Excel needs the `openpyxl` Python library**: Install it with `pip install --user openpyxl` (Recommended), Save as CSV (a plain table file Excel opens) instead, Skip Excel.
 3. Sheets: **Summary** (counts, source, rules, date), **Smoke**, **Regression**, **Skip**, **Gaps**, and **Not in this build** when it has rows.
 4. Columns on Smoke and Regression: Key, Title, Type, Priority, Risk, Score, Reason, Areas to check, Existing tests, Gap, plus empty **Status** (Pass / Fail / Blocked dropdown), **Tester** and **Notes** columns for QA.
 5. Clean every cell as in **Before saving**. Bold header row, frozen top row, wrapped text, readable column widths, and the ticket key as a link to the ticket when the ticket system's URL is known.
@@ -408,23 +405,23 @@ Write the Step 6 report, with the first line `# Smoke and regression report: <na
    - A connector for that service in this session.
    - SharePoint or OneDrive: `m365 spo file add --webUrl <site URL> --folder "<library>/<folder path>" --path <file>`, if `m365 status` shows it is signed in.
    - Neither: say no upload tool is connected and which connector would make it work. Save the file in `docs/test-scope/` as in 8a, and give the exact place to upload it by hand.
-3. Show the file name and full destination. Ask — **Upload to <service>?**: Upload (Recommended), Change the folder for this file only, Retry previous answer. Upload only on yes.
+3. Show the file name and full destination. Ask — **Upload to <service>?**: Upload (Recommended), Change the folder for this file only. Upload only on yes.
 4. Give the link to the uploaded file. If the upload fails, show the error in one line, save the file in the repo folder instead, and say so.
 
 ### 8e — Confluence page
 
 1. Build the page from the Step 6 report, titled `Smoke and regression report: <name>`.
-2. If a page with that title exists under the parent, ask: Update it (Recommended), Create `<title> (2)`, Retry previous answer.
-3. Show the title, space and parent. Ask — **Create this page?**: Create it (Recommended), Change the parent page, Retry previous answer. Create only on yes, then give the link.
+2. If a page with that title exists under the parent, ask: Update it (Recommended), Create `<title> (2)`.
+3. Show the title, space and parent. Ask — **Create this page?**: Create it (Recommended), Change the parent page. Create only on yes, then give the link.
 
 ### 8f — Labels on tickets
 
 1. List what will change: each key and the label it gets. Smoke tickets get both labels. Skip tickets get none. Leave out tickets that already have the label.
-2. Ask — **Add labels to <n> tickets?**: Add them (Recommended), Smoke labels only, Retry previous answer. Label only on yes.
+2. Ask — **Add labels to <n> tickets?**: Add them (Recommended), Smoke labels only. Label only on yes.
 3. Add, keeping every existing label or tag:
    - **Jira** — the connector's edit-issue tool, adding to the `labels` field.
    - **Azure DevOps** — read the current `System.Tags`, then `az boards work-item update --id <id> --fields "System.Tags=<existing>; <new tag>"`.
-4. If one ticket fails, stop, show the error in one line, list what was labelled so far, and ask: Retry the rest (Recommended), Stop here, Retry previous answer.
+4. If one ticket fails, stop, show the error in one line, list what was labelled so far, and ask: Retry the rest (Recommended), Stop here.
 
 ## Step 9 — Report back
 

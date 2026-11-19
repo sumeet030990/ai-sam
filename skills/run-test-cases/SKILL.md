@@ -37,9 +37,8 @@ Where it fits:
 - **Ask before anything outward-facing.** Show the exact file and destination, or the exact comment text, before uploading or posting. Never commit or push.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the repo and the results. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, database dumps or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -145,10 +144,10 @@ If any command is **Changed on this branch**, add one line under the table: "The
 
 Then ask, in one call:
 
-1. **Run these tests?** Run the plan (Recommended), Unit tests only, Feature tests only, Retry previous answer.
-2. **Also measure coverage?** (only if a coverage command exists): No (Recommended when the suite is slow), Yes — `<command>`, Retry previous answer.
-3. **Feature test environment** (only if a feature suite needs an app that doesn't start itself): Start `<exact commands>` and stop them afterwards (Recommended), It's already running at a URL I give in Other, Skip feature tests, Retry previous answer.
-4. **Compare with the base branch?** (only on a branch other than the base): No (Recommended), Yes — run the failing tests again on `<base branch>` to split new failures from ones already failing, Retry previous answer.
+1. **Run these tests?** Run the plan (Recommended), Unit tests only, Feature tests only.
+2. **Also measure coverage?** (only if a coverage command exists): No (Recommended when the suite is slow), Yes — `<command>`.
+3. **Feature test environment** (only if a feature suite needs an app that doesn't start itself): Start `<exact commands>` and stop them afterwards (Recommended), It's already running at a URL I give in Other, Skip feature tests.
+4. **Compare with the base branch?** (only on a branch other than the base): No (Recommended), Yes — run the failing tests again on `<base branch>` to split new failures from ones already failing.
 
 A URL given by the user: ask that it is not production before using it. If it looks like production (no `dev`, `qa`, `test`, `staging` or `localhost` in it), don't use it, and say why.
 
@@ -289,11 +288,10 @@ Ask — **Where should I save this report?**:
 - **Same as last time** — list the saved places in one line, e.g. "Markdown in `docs/test-runs/` + SharePoint `QA/Test runs`". (Recommended)
 - **Change where to save** — run 7b again and replace the saved line.
 - **Only this time: somewhere else** — run 7b's questions but don't save the answers.
-- **Retry previous answer**.
 
 ### Before saving
 
-- If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+- If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`.
 - If a saved folder no longer exists or access is denied, say so and offer **Change where to save**.
 
 ## Step 8 — Save
@@ -326,7 +324,7 @@ Write the Step 6 report, with the first line `# Test run report: <repo> on <bran
 ### 8c — Excel file
 
 1. Use the `xlsx` skill if this session has one. Otherwise write a short Python script in a temporary folder outside the repo using `openpyxl`.
-2. If `openpyxl` is missing, ask — **Excel needs the `openpyxl` Python library**: Install it with `pip install --user openpyxl` (Recommended), Save as CSV (a plain table file Excel opens) instead, Skip Excel, Retry previous answer.
+2. If `openpyxl` is missing, ask — **Excel needs the `openpyxl` Python library**: Install it with `pip install --user openpyxl` (Recommended), Save as CSV (a plain table file Excel opens) instead, Skip Excel.
 3. Sheets: **Summary** (result, totals, branch, commit, date), **By suite**, **Failures**, and **Flaky**, **Coverage**, **Not run** when they have rows.
 4. **Failures** columns: Suite, Type, Test, File, Error, Likely cause, Changed on this branch, plus empty **Owner**, **Ticket** and **Notes** columns for the team.
 5. Bold header row, frozen top row, wrapped text and readable column widths.
@@ -339,19 +337,19 @@ Write the Step 6 report, with the first line `# Test run report: <repo> on <bran
    - A connector for that service in this session.
    - SharePoint or OneDrive: `m365 spo file add --webUrl <site URL> --folder "<library>/<folder path>" --path <file>`, if `m365 status` shows it is signed in.
    - Neither: say no upload tool is connected and which connector would make it work. Save the file in `docs/test-runs/` as in 8a, and give the exact place to upload it by hand.
-3. Show the file name and full destination. Ask — **Upload to <service>?**: Upload (Recommended), Change the folder for this file only, Retry previous answer. Upload only on yes.
+3. Show the file name and full destination. Ask — **Upload to <service>?**: Upload (Recommended), Change the folder for this file only. Upload only on yes.
 4. Give the link to the uploaded file. If the upload fails, show the error in one line, save the file in the repo folder instead, and say so.
 
 ### 8e — Confluence page
 
 1. Build the page from the Step 6 report, titled `Test run report: <repo> <branch> <YYYY-MM-DD>`.
-2. If a page with that title exists under the parent, ask: Update it (Recommended), Create `<title> (2)`, Retry previous answer.
-3. Show the title, space and parent. Ask — **Create this page?**: Create it (Recommended), Change the parent page, Retry previous answer. Create only on yes, then give the link.
+2. If a page with that title exists under the parent, ask: Update it (Recommended), Create `<title> (2)`.
+3. Show the title, space and parent. Ask — **Create this page?**: Create it (Recommended), Change the parent page. Create only on yes, then give the link.
 
 ### 8f — Jira comment
 
 1. Build a short comment: result line, totals, the **By suite** table, up to 10 failures (test, error, likely cause), and the link to the saved file if there is one.
-2. Show the exact comment text and the ticket key. Ask — **Post this comment on `<key>`?**: Post it (Recommended), Change the text, Retry previous answer. Post only on yes, then give the link.
+2. Show the exact comment text and the ticket key. Ask — **Post this comment on `<key>`?**: Post it (Recommended), Change the text. Post only on yes, then give the link.
 
 ## Step 9 — Report back
 

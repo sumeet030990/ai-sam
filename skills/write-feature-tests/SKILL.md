@@ -44,9 +44,8 @@ Where it fits:
 - **Report test results honestly.** If a test fails, say so and show the error. Never delete, skip or weaken a test, or add a retry, just to make it pass.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the ticket and the code. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, database dumps or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -84,13 +83,13 @@ Find the repo root with `git rev-parse --show-toplevel` and the current branch w
 - **A Jira key or pasted ticket** → **Ticket mode** (1A).
 - **A feature, screen, page, route or endpoint** → **Feature mode** (1B).
 - **Nothing was given** → **Branch mode** (1C). If the branch name holds a ticket key (e.g. `feature/ABC-123-...`), also fetch that ticket as in 1A and use its acceptance criteria.
-- **Unclear** (e.g. "test payments"): ask — **What should I test?** Options: up to 2 best-matching screens or endpoints found in the repo (the closest one Recommended), Changes on this branch, Retry previous answer. Say the user can type a ticket key or feature in **Other**.
+- **Unclear** (e.g. "test payments"): ask — **What should I test?** Options: up to 2 best-matching screens or endpoints found in the repo (the closest one Recommended), Changes on this branch. Say the user can type a ticket key or feature in **Other**.
 
 ### 1A — Ticket mode
 
 1. Get the ticket:
    - **A key and a Jira connector is available** — fetch the summary, description, acceptance criteria and linked issues. Say in one line that you fetched it.
-   - **A key but no Jira connector** — ask (the first question, so no **Retry previous answer**) — **Ticket details**: Paste the summary, description and acceptance criteria in Other (Recommended), Describe the feature in a few lines in Other.
+   - **A key but no Jira connector** — ask — **Ticket details**: Paste the summary, description and acceptance criteria in Other (Recommended), Describe the feature in a few lines in Other.
    - **Pasted text** — use it as is.
 2. Check it for personal or secret data before going on.
 3. Number the acceptance criteria (AC1, AC2, …). Each becomes one or more scenarios in Step 4.
@@ -166,7 +165,7 @@ For each existing feature test file found:
 
 If it is unclear whether the code or the test is right, don't guess. Add it to **Questions**.
 
-**No feature test tool for a layer the feature touches:** ask — **No `<frontend E2E / backend integration>` setup found**: Add `<tool that fits the stack>` (Recommended — name the packages, files and any browsers or images it downloads), Use a tool I name in Other, Skip this layer, Retry previous answer. Add packages only on a yes.
+**No feature test tool for a layer the feature touches:** ask — **No `<frontend E2E / backend integration>` setup found**: Add `<tool that fits the stack>` (Recommended — name the packages, files and any browsers or images it downloads), Use a tool I name in Other, Skip this layer. Add packages only on a yes.
 
 ## Step 4 — Plan the scenarios
 
@@ -304,7 +303,7 @@ Used when no QA agent exists.
 
 1. Check what is already running (e.g. the base URL responds, `docker ps` shows the test database). Don't stop or restart anything the user started.
 2. If the test setup starts the app itself (a Playwright `webServer`, an in-memory test host, Testcontainers), say so — no extra start is needed. Testcontainers still needs Docker running.
-3. Otherwise, ask — **Start the app for the tests?** Start `<exact commands>` and stop them afterwards (Recommended), It's already running at a URL I give in Other, Don't run — write only, Retry previous answer. Name every command, port and container it starts.
+3. Otherwise, ask — **Start the app for the tests?** Start `<exact commands>` and stop them afterwards (Recommended), It's already running at a URL I give in Other, Don't run — write only. Name every command, port and container it starts.
 4. A URL given by the user: ask it is not production before using it. If it looks like production (e.g. no `dev`, `qa`, `test`, `staging` or `localhost` in it), don't run, and say why.
 5. **Can't start it** (Docker not running, a missing secret, a service in another repo): don't work around it. Move the run to **Not run** with the reason and the command the user can run later.
 
@@ -322,7 +321,7 @@ Used when no QA agent exists.
      **Proposed fix:** <one-line change, with a short diff>
      ```
 
-     Then ask — **Possible bug in `<feature>`**: Fix the source code (Recommended when the fix is small and in this branch's changed lines), Leave the code and mark the test skipped with a note, The app is right — change the test, Retry previous answer.
+     Then ask — **Possible bug in `<feature>`**: Fix the source code (Recommended when the fix is small and in this branch's changed lines), Leave the code and mark the test skipped with a note, The app is right — change the test.
    - **The environment is wrong** (a service down, a missing seed, a port in use): fix the setup if it is a test setup file. Otherwise move the test to **Not run** with the reason.
 3. Run the full feature test command once all new tests pass, if it takes under 10 minutes or the user agrees. Failures in tests this change didn't touch go under **Already failing**. Don't fix them.
 4. Stop every app, server and container this skill started. Leave test databases clean.
@@ -401,5 +400,5 @@ Leave out empty sections, except **Acceptance criteria** (in Ticket mode), **Tes
 
 Then ask — **Next step**: Done, leave it uncommitted (Recommended), Commit the tests, Retry with edits.
 
-- **Commit the tests** — show the commit message first (`Add feature tests for <short summary>`, or `Update feature tests for <short summary>` when existing tests changed, then 2–4 bullets of what is covered; start with the ticket key if there is one) and ask: Commit (Recommended), Change the message, Retry previous answer. Commit only the files in the report. Then ask whether to push; push only on yes.
+- **Commit the tests** — show the commit message first (`Add feature tests for <short summary>`, or `Update feature tests for <short summary>` when existing tests changed, then 2–4 bullets of what is covered; start with the ticket key if there is one) and ask: Commit (Recommended), Change the message. Commit only the files in the report. Then ask whether to push; push only on yes.
 - **Retry with edits** — ask what to change (a scenario, more scenarios, fewer scenarios, or **Other**). Change only that, re-run Step 7 and Step 8, and show the report again.

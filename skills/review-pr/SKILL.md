@@ -32,9 +32,8 @@ Where it fits:
 - **Report checks honestly.** If a test, lint or build fails, say so and show the error. Never say "nothing breaks" without the impact check and the checks behind it.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the diff and the code. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -103,7 +102,7 @@ Then, in every mode, check for an earlier review (1D).
    | Bitbucket and others | — | No CLI (command-line tool) — ask for the branch name | Diff as in 1C |
 
    Strip `refs/heads/` from Azure DevOps branch names.
-3. **The tool is missing or not signed in:** ask — **PR details**: Give the branch name in Other (Recommended), Paste the diff in Other, Retry previous answer. Then continue as 1C, or review the pasted diff. Don't install tools or sign in for the user; say which command would fix it.
+3. **The tool is missing or not signed in:** ask — **PR details**: Give the branch name in Other (Recommended), Paste the diff in Other. Then continue as 1C, or review the pasted diff. Don't install tools or sign in for the user; say which command would fix it.
 4. Use the PR's base branch as the base branch, and its title and description as the intent in Step 3.
 
 ### 1C — A branch
@@ -139,7 +138,7 @@ Say in one line how many were found, e.g. "2 control files changed: `package.jso
 
 - **Nothing changed:** say so in one line and stop.
 - Skip lock files, generated code, build output and binary files in the line-by-line review. List them under **Not reviewed**, but still flag a lock file that adds or upgrades packages.
-- **More than 40 changed files or 2,000 changed lines:** ask — **Large change**: Review everything (Recommended — say it will take longer), Review the files with the most logic first (name the top 15), Retry previous answer. Say the user can name files in **Other**.
+- **More than 40 changed files or 2,000 changed lines:** ask — **Large change**: Review everything (Recommended — say it will take longer), Review the files with the most logic first (name the top 15). Say the user can name files in **Other**.
 
 ## Step 2 — Load the project
 
@@ -321,8 +320,8 @@ Running the checks runs the branch's code on this machine. Before the first comm
 
 - **Current changes mode:** run them in the repo root.
 - **PR or branch mode:** the code isn't checked out. Ask — **Run the checks?**
-  - **No such control files changed:** Run them in a temporary worktree (a second folder with the PR's branch, so your folder is left as it is) (Recommended), Skip the checks and review the code only, Retry previous answer.
-  - **Such control files changed:** Skip the checks and review the code only (Recommended — "this change edits files that decide what runs: `<files>`"), Show me those changes first, Run them in a temporary worktree anyway, Retry previous answer. **Show me those changes first** shows the diff of those files, then asks again.
+  - **No such control files changed:** Run them in a temporary worktree (a second folder with the PR's branch, so your folder is left as it is) (Recommended), Skip the checks and review the code only.
+  - **Such control files changed:** Skip the checks and review the code only (Recommended — "this change edits files that decide what runs: `<files>`"), Show me those changes first, Run them in a temporary worktree anyway. **Show me those changes first** shows the diff of those files, then asks again.
   - For a worktree: `git worktree add ../<repo folder>-review <branch>`, install dependencies there with the install command, and run the checks inside it.
   - Never run a command the branch added or changed that is not a test, lint, build or type-check command.
 - **A command needs something you don't have** (a database, a secret, a running service): don't work around it. List it under **Not run** with the reason.
@@ -330,7 +329,7 @@ Running the checks runs the branch's code on this machine. Before the first comm
 Sort each failure:
 
 - **Caused by this change** — the failing test or file is in the diff, or calls code the diff changed. Make it a finding.
-- **Not clearly caused by this change** — ask — **Was this already failing?** Run the same check on `<base branch>` in a temporary worktree to compare (Recommended), List it as already failing without checking, Retry previous answer. Failures that also happen on the base branch go under **Already failing**.
+- **Not clearly caused by this change** — ask — **Was this already failing?** Run the same check on `<base branch>` in a temporary worktree to compare (Recommended), List it as already failing without checking. Failures that also happen on the base branch go under **Already failing**.
 
 Remove any worktree you made in this step with `git worktree remove <path>` once the checks finish, and say so.
 
@@ -449,7 +448,7 @@ Leave out empty sections, except **Checks** and **What else this change touches*
 Then ask — **Next step**: Done (Recommended), Fix the findings, Post the review as PR comments, Retry with edits.
 
 - **Fix the findings** — ask which (All Blockers (Recommended), All Blockers and Should fix, or pick by number in **Other**). Fix only those, in the current branch only; in PR or branch mode, say the fix must go on that branch and ask before switching to it or making a worktree. Run the checks from 6b again and show the updated report. Don't commit; then offer the usual commit question (show the message first, commit only on yes, push only on a second yes).
-- **Post the review as PR comments** — only in PR mode with the host's tool signed in (GitHub `gh`, Azure DevOps `az`, GitLab `glab`). Show every comment first (file, line, text), and the summary comment with the verdict. Ask: Post them (Recommended), Change the text, Retry previous answer. Post only on yes: `gh api` review comments on GitHub, `az devops invoke --area git --resource pullRequestThreads` on Azure DevOps, `glab mr note` on GitLab. Leave this option out for other hosts. Never approve or request changes on the PR unless the user asks for that too.
+- **Post the review as PR comments** — only in PR mode with the host's tool signed in (GitHub `gh`, Azure DevOps `az`, GitLab `glab`). Show every comment first (file, line, text), and the summary comment with the verdict. Ask: Post them (Recommended), Change the text. Post only on yes: `gh api` review comments on GitHub, `az devops invoke --area git --resource pullRequestThreads` on Azure DevOps, `glab mr note` on GitLab. Leave this option out for other hosts. Never approve or request changes on the PR unless the user asks for that too.
 - **Retry with edits** — ask what to change (Review deeper on a file, Ignore a finding, Check another repo, or **Other**). Change only that, re-run what it affects, and show the report again.
 
 Never update the Jira ticket unless the user asks. If they do, show the comment first and wait for a yes.

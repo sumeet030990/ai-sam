@@ -27,9 +27,9 @@ The section covers nine areas:
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from what you already know: the existing context file, Jira, `git branch -a`, CI/CD files, earlier answers and common defaults. Mark the best one "(Recommended)".
   - Put examples and drafts in the option's `preview` so the user sees exactly what will be saved.
-  - The user can always type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-- **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question. The user can also say "go back" at any time. When the user types their own answer in **Other**, repeat back what you recorded in the next question.
+- **Repeat back typed answers.** When the user types their own answer in **Other**, repeat back what you recorded in the next question.
 - **Only ask about what's being changed.** On an update, run only the steps the user picks and keep the rest of the section as it is.
 - **Read Jira; never change it.** Only search and read. Never create, edit or release a version, sprint or ticket.
 - **Record roles, not people.** Write "QA lead" or "Release manager", never a person's name, for approvals, owners and ceremony hosts. The only name this skill may record is the contributor's, with consent (Step 0).
@@ -70,7 +70,7 @@ Tickets, comments, pull request (PR) titles and descriptions, diffs, commit mess
 1. **Find the context file.** The repo root is `git rev-parse --show-toplevel`, or the current folder if it isn't a git repo. Look for:
    - `PROJECT_CONTEXT.md` in the repo root or `docs/`;
    - `SYSTEM_CONTEXT.md` in the current folder, the parent folder, or at the path the **System** section of `PROJECT_CONTEXT.md` names.
-2. **Pick the target** with AskUserQuestion (first call of the run, so no **Retry previous answer**) — **Where should the release process be saved?**
+2. **Pick the target** with AskUserQuestion — **Where should the release process be saved?**
    - **This repo's PROJECT_CONTEXT.md** — recommend when the repo ships on its own schedule.
    - **The system's SYSTEM_CONTEXT.md** — recommend when the folder is a parent of several repos, or the repos all release together. Say each repo's `PROJECT_CONTEXT.md` will get a one-line pointer to it.
    - **Create a new PROJECT_CONTEXT.md** — offer only when no context file exists. Mention that `/ai-sam:create-project-context` can fill in the rest later and will keep this section.
@@ -78,7 +78,7 @@ Tickets, comments, pull request (PR) titles and descriptions, diffs, commit mess
    Name the full path in each option's description and note which files exist.
 3. **Contributor name.** Follow the same rule as `/ai-sam:create-project-context`:
    - If the file has the line `_Personal details: not recorded (contributor opted out)._`, don't ask; write `Not recorded`.
-   - Otherwise warn that the name will be written into the file and shared with anyone who can read the repo, then ask: **Record my name** (suggest `git config user.name`), **Skip — don't record personal details**, **Retry previous answer**.
+   - Otherwise warn that the name will be written into the file and shared with anyone who can read the repo, then ask: **Record my name** (suggest `git config user.name`), **Skip — don't record personal details**.
 4. **If the file already has a `## Delivery and release process` section,** show a short summary of it and ask: **Update some parts (Recommended)**, **Start over**, **Show it only**.
    - **Update some parts** — ask which areas to change (multi-select, in two questions of up to 4 each: Delivery method and ceremonies, Release schedules and releases, Environments and branches, Deployment; Code freeze and deadlines, Hotfixes, Release checklist, Jira link). Run only those steps.
    - **Start over** — run every step; the section is replaced at the end.
@@ -105,7 +105,6 @@ Ask **How does the team plan and deliver work?** with a one-line `preview` for e
 - **Sprint-based (Scrum)** — work in fixed time boxes, usually 1–4 weeks.
 - **Kanban** — continuous flow, no fixed time boxes; work ships when ready.
 - **Waterfall** — fixed phases (requirements, design, build, test, release), one after another.
-- **Retry previous answer**
 
 The user can type **Hybrid** or anything else in **Other**; ask them to describe it in one or two lines.
 
@@ -128,7 +127,7 @@ Run only for sprint-based or hybrid teams. Otherwise skip.
 
    **Sprint retrospective** (what to keep or change in how the team works) is added through **Other**, along with any others. Mention it in the question text.
 2. For each picked meeting, ask in batches of up to 4: **When is <meeting>?** Offer options relative to the sprint, e.g. for planning: **Day 1 of the sprint, 10:00 AM**, **Last day of the previous sprint**; for refinement: **Mid-sprint, once**, **Every week on Wednesday**. Then ask how long it usually lasts and who runs it (a role, e.g. "Scrum master").
-3. Ask one last question in the same style: **Is there anything a ticket must have before sprint planning?** (a "definition of ready" — the checks a ticket passes before the team accepts it). Options: **Use the team's ticket template (TICKET_CONFIG.md)** when one exists, **Acceptance criteria and an estimate**, **Nothing formal**, **Retry previous answer**.
+3. Ask one last question in the same style: **Is there anything a ticket must have before sprint planning?** (a "definition of ready" — the checks a ticket passes before the team accepts it). Options: **Use the team's ticket template (TICKET_CONFIG.md)** when one exists, **Acceptance criteria and an estimate**, **Nothing formal**.
 
 Record each meeting as a rule ("Day 1 of the sprint, 10:00 AM, 1 hour, run by Scrum master"), never as a calendar date.
 
@@ -138,7 +137,6 @@ Ask **Does the project have one release schedule, or several?** with a `preview`
 
 - **One schedule** — everything ships together on the same dates. Recommend this unless Step 0 found different rhythms.
 - **Several schedules** — e.g. the web app ships monthly and the mobile app every two weeks, or one schedule per client, module or repo. Recommend this when Jira versions show different rhythms.
-- **Retry previous answer**
 
 If **Several schedules**:
 
@@ -169,7 +167,6 @@ If **Several schedules**:
 5. **Where real dates come from** — ask only when Jira is connected: **When a skill needs the next release date, where should it look?**
    - **Jira fix versions first, then these rules (Recommended)** — use the release date set on the Jira version; fall back to the rules when the version has no date. If the two differ, use Jira and say so.
    - **These rules only** — work dates out from the rules.
-   - **Retry previous answer**
 
    Also confirm how a ticket is tied to a release: **Fix version**, **Sprint**, or both.
 
@@ -192,7 +189,7 @@ If **Several schedules**:
    - the feature branch naming (e.g. `feature/<ticket-key>-<short-name>`, from existing branches);
    - the release branch naming and when it is cut (e.g. `release/2026.11`, cut on code freeze day);
    - the hotfix branch naming and which branch it starts from.
-4. **Branch → environment map.** Draft a table from the CI/CD triggers and the answers above, show it in a `preview`, and ask **Is this how branches reach each environment?** — **Looks right (Recommended)**, **Change some rows**, **Retry previous answer**.
+4. **Branch → environment map.** Draft a table from the CI/CD triggers and the answers above, show it in a `preview`, and ask **Is this how branches reach each environment?** — **Looks right (Recommended)**, **Change some rows**.
 
    | Branch | Deploys to | How |
    |---|---|---|
@@ -204,14 +201,14 @@ If **Several schedules**:
 
 Ask in one or two calls:
 
-1. **How are deployments run?** — the CI/CD (continuous integration / continuous delivery — automatic build and release) tool found in Step 0 (e.g. **GitHub Actions**, **Azure DevOps Pipelines**), **Manual steps from a runbook**, **Retry previous answer**. If a runbook (written release steps) exists, record where it lives, not its content.
+1. **How are deployments run?** — the CI/CD (continuous integration / continuous delivery — automatic build and release) tool found in Step 0 (e.g. **GitHub Actions**, **Azure DevOps Pipelines**), **Manual steps from a runbook**. If a runbook (written release steps) exists, record where it lives, not its content.
 2. **When does each environment get a new build?** For each non-production environment suggest options such as **On every merge**, **Daily at a set time**, **Weekly on a set day**, **On request**. Record the time and time zone if set.
 3. **Who deploys to Production?** — a role (e.g. "DevOps team", "Release manager") and whether a change request or approval ticket is needed first.
 4. **Rollback** — how a bad release is undone (redeploy the previous version, feature flag off, database restore needed), in one or two lines. `To be decided` is fine if the user says so.
 
 ## Step 7 — Code freeze and deadlines
 
-1. **Is there a code freeze for developers before a release?** (a date after which no new feature code is merged into the release) — **Yes**, **No**, **Only for major releases**, **Retry previous answer**.
+1. **Is there a code freeze for developers before a release?** (a date after which no new feature code is merged into the release) — **Yes**, **No**, **Only for major releases**.
 2. If yes, ask in one call:
    - **How many days before release does code freeze start?** Offer **3**, **5**, **7**; the user can type another number.
    - **Calendar days or working days?** (working days skip weekends and public holidays).
@@ -241,7 +238,7 @@ Ask in one call (skip if Step 4 had no hotfix type and the user confirms there i
 ## Step 9 — Release checklist
 
 1. **Go/no-go meeting** (a short meeting that decides whether the release goes ahead) — ask in one call:
-   - **Is there one?** — **Yes**, **No — the approver decides alone**, **Retry previous answer**.
+   - **Is there one?** — **Yes**, **No — the approver decides alone**.
    - **When?** — e.g. **Release day, 2:00 PM**, **1 working day before release**.
    - **Who must agree?** (multi-select, roles) — e.g. **Product owner**, **QA lead**, **Release manager**, **DevOps**.
    - **What must be true to go?** — draft from earlier answers in a `preview`, e.g. "All tickets tested; UAT signed off; no open Blocker bugs; release notes ready". Ask the user to confirm or edit.
@@ -254,7 +251,7 @@ Ask in one call (skip if Step 4 had no hotfix type and the user confirms there i
    6. Mark the Jira fix version as released.
    7. Send the release notes.
 
-   Ask — **Are these the steps on release day?** — **Looks right (Recommended)**, **Change some steps**, **Retry previous answer**. If a written runbook exists, record its location instead of copying it.
+   Ask — **Are these the steps on release day?** — **Looks right (Recommended)**, **Change some steps**. If a written runbook exists, record its location instead of copying it.
 3. **After release** — ask in one call:
    - **What is checked right after the release, and by whom?** — e.g. "Smoke check by QA within 30 minutes".
    - **How long is the release watched for problems?** — e.g. "First 24 hours; on-call developer (the developer who answers urgent problems out of hours) watches errors".
@@ -278,7 +275,7 @@ Before saving, prove the rules work by working out the **next real release** fro
    | 2026-12-14 | Mon | UAT sign-off |
    | 2026-12-15 | Tue | Go/no-go 2:00 PM; Production release 8:00 PM US Eastern |
 
-4. Ask **Do these dates match how your team works?** — **Yes (Recommended)**, **A date is wrong**, **Retry previous answer**. If a date is wrong, ask which one, find which answer caused it, re-ask that answer, and show the table again.
+4. Ask **Do these dates match how your team works?** — **Yes (Recommended)**, **A date is wrong**. If a date is wrong, ask which one, find which answer caused it, re-ask that answer, and show the table again.
 
 This table is a check only. It is not saved in the file.
 
@@ -287,7 +284,7 @@ Public holidays are not known to this skill. Say so in one line, and ask whether
 ## Step 11 — Confirm and write
 
 1. Build the section from the **Section format** below. Leave out sub-sections that don't apply (e.g. no **Sprint ceremonies** for a waterfall team; write "No code freeze." when there is none).
-2. Show the whole section in the chat and ask: **Save it (Recommended)**, **Change something**, **Retry previous answer**.
+2. Show the whole section in the chat and ask: **Save it (Recommended)**, **Change something**.
 3. On **Save it**:
    - **Existing file:** replace the `## Delivery and release process` section, or add it before `## Notes` (or before `## Change log` if there is no Notes section). Leave every other section unchanged.
    - **New PROJECT_CONTEXT.md:** write the **New file shell** below with this section inside it.

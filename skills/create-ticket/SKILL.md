@@ -13,14 +13,13 @@ Ask the user the questions that matter for the kind of ticket they want, then wr
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from what you already know (earlier answers, pasted notes, the repo, the ticket type). Mark the best one "(Recommended)".
   - For long answers (a description, a list of steps, acceptance criteria), draft the text yourself and put it in the option's `preview`, so the user can pick it as-is.
-  - The user can always type their own answer in the built-in **Other** textbox. Say so in the question text, e.g. "…or type your own in Other".
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-- **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question. The user can also say "go back" at any time.
 - **Let the user redo anything you drafted.** Whenever you show text you wrote (summary drafts, acceptance criteria, steps, the full ticket), offer these two options alongside the others:
   - **Retry** — write a fresh version from the same answers, with different wording or structure. Don't repeat the previous draft.
   - **Retry with edits** — ask what to change (e.g. "shorter", "add a step for admins", "less technical", "drop the out-of-scope section") through a follow-up AskUserQuestion with likely edits as options and the **Other** textbox for their own. Apply only those changes, keep everything else as it was, and show the result again.
 
-  Both can be repeated as many times as the user likes. AskUserQuestion allows only 4 options, so when a question also needs **Retry previous answer**, show one suggested draft with it. The user can also type "retry" or "retry with …" in **Other** at any time.
+  Both can be repeated as many times as the user likes. The user can also type "retry" or "retry with …" in **Other** at any time.
 - **Keep it short.** Skip questions the user's notes already answer — show what you understood and ask them to confirm instead. Don't ask about optional fields one by one; ask once whether they want any of them.
 - **No personal or secret data.** Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
@@ -77,7 +76,7 @@ Also read the `## Delivery and release process` section of `PROJECT_CONTEXT.md` 
 
 If the user pasted notes or gave a description with the request, read it first and use it to suggest answers.
 
-Ask with AskUserQuestion (the first call of a run, so no **Retry previous answer**) — **Ticket type**: Story (new feature or change for users), Bug (something is broken), Task (work that needs doing, e.g. setup or clean-up); Epic and Spike (research) through **Other**. Recommend the type that fits the user's notes. If the notes already make the type obvious, skip the question and say which type you picked.
+Ask with AskUserQuestion — **Ticket type**: Story (new feature or change for users), Bug (something is broken), Task (work that needs doing, e.g. setup or clean-up); Epic and Spike (research) through **Other**. Recommend the type that fits the user's notes. If the notes already make the type obvious, skip the question and say which type you picked.
 
 Use the config's custom template for that type if Step 0 found one; otherwise use the standard format (see **Standard templates**). Don't ask the user which template to use.
 
@@ -179,10 +178,9 @@ Without a release section, offer the unreleased Jira fix versions or open sprint
 ## Step 3 — Draft, review, and finish
 
 1. Write the ticket using the config's custom template for this type or the matching standard template below, the config's summary and acceptance criteria style, the **Writing style** rules, and the answers from Step 2.
-2. Show the full draft in the chat and ask with AskUserQuestion: Looks good (Recommended), Retry, Retry with edits, Retry previous answer.
+2. Show the full draft in the chat and ask with AskUserQuestion: Looks good (Recommended), Retry, Retry with edits.
    - **Retry** — rewrite the whole ticket from the same answers in a fresh way, then show it and ask again.
    - **Retry with edits** — ask what to change, with common edits as options (Make it shorter, Simpler language, Change a section) and **Other** for their own. Apply only those changes, then show it and ask again.
-   - **Retry previous answer** — go back to a question from Step 2, update the answer, and redraft.
 
    Repeat until the user picks **Looks good**.
 
@@ -204,7 +202,7 @@ Without a release section, offer the unreleased Jira fix versions or open sprint
    | GitLab | `glab auth status` succeeds | `glab issue create --repo <group/name> --description "$(cat <file>)"` |
 
    Bitbucket teams usually log tickets in Jira — use the Jira row.
-3. **No saved board, but a tracker is connected.** When the user picks posting in 4b, ask — **Which board should this go on?**: the projects, boards or teams the tracker lists (best match to the repo Recommended), Retry previous answer. Then ask — **Save this board for next time?**: Yes, for the team — `TICKET_CONFIG.md` (Recommended), Yes, just for me — `~/.claude/ai-sam/TICKET_CONFIG.md`, No. On yes, add or replace only the `## Board` section (format in `/ai-sam:setup-ticket-config`) and a dated **Change log** line. Leave every other section as it is.
+3. **No saved board, but a tracker is connected.** When the user picks posting in 4b, ask — **Which board should this go on?**: the projects, boards or teams the tracker lists (best match to the repo Recommended). Then ask — **Save this board for next time?**: Yes, for the team — `TICKET_CONFIG.md` (Recommended), Yes, just for me — `~/.claude/ai-sam/TICKET_CONFIG.md`, No. On yes, add or replace only the `## Board` section (format in `/ai-sam:setup-ticket-config`) and a dated **Change log** line. Leave every other section as it is.
 4. **Saved board, but its tracker is not connected.** Say in one line which connector or sign-in would make it work (e.g. "Connect the Atlassian connector" or "run `az login`"). Don't offer posting.
 
 ### 4b — Ask
@@ -214,21 +212,20 @@ Ask — **What should I do with this ticket?**:
 - **Create it on <tracker> — <project / board>** — (Recommended when a board is connected.) With a tracker connected but no saved board, label it **Create it on <tracker>** and pick the board in 4a step 3.
 - **Save as a Markdown file** — to `docs/tickets/<summary in lower-case-with-dashes>.md`. (Recommended when nothing is connected.) Say the user can type another path in **Other**.
 - **Keep it in the chat only** — stop here.
-- **Retry previous answer** — go back to the draft review.
 
 With split tickets, the choice covers all of them.
 
 ### 4c — Create it on the board
 
 1. **Check for personal or secret data again** (see **Ground rules**). The ticket is about to leave this session.
-2. **Check for duplicates.** Search the project for open tickets with a similar summary. If any look the same, list them (key and summary) and ask: Create anyway (Recommended only if they differ), Don't create — keep it in the chat, Retry previous answer.
+2. **Check for duplicates.** Search the project for open tickets with a similar summary. If any look the same, list them (key and summary) and ask: Create anyway (Recommended only if they differ), Don't create — keep it in the chat.
 3. **Map the fields** to what the project really has. Read its issue types, priorities and fields from the tracker; don't guess names.
    - **Type** — Story, Bug, Task, Epic use the same-named type. Azure DevOps Agile uses **User Story** for Story, Scrum uses **Product Backlog Item**. If the project has no **Spike** type, ask which to use (Task Recommended).
    - **Summary** — the tracker's title field.
    - **Description** — Jira: Markdown, if the tool takes it, else the connector's own format. Azure DevOps: HTML, with `<`, `>`, `&` and `"` escaped in the text. GitHub and GitLab: Markdown.
    - **Priority, labels, story points, target release** — set the tracker's own field only when the user gave a value and the project has that field. Add the `Board` section's default labels. Otherwise leave the value in the description.
    - **Azure DevOps** — add the saved area path and iteration.
-4. **Show exactly what will be created**: tracker, project, board, type, summary, fields set, and the first lines of the description. Ask — **Create this ticket on <project>?**: Create it (Recommended), Change a field, Retry previous answer. Create only on yes.
+4. **Show exactly what will be created**: tracker, project, board, type, summary, fields set, and the first lines of the description. Ask — **Create this ticket on <project>?**: Create it (Recommended), Change a field. Create only on yes.
 5. **Create it.**
    - **Shell commands** (`az`, `gh`, `glab`): never put the summary or description straight on the command line. Write each to a temporary file outside the repo, pass it as `"$(cat <file>)"` or `--body-file <file>`, then delete the file.
    - **Split tickets** — create them in the dependency order the user gave. Then link each pair: Jira **Blocks** (or **Relates** if the project has no Blocks link), Azure DevOps **Predecessor / Successor**, GitHub and GitLab — add a "Depends on #<n>" line to the later ticket's description. Use the link names the tracker returns.
@@ -236,7 +233,7 @@ With split tickets, the choice covers all of them.
 
 ### 4d — Save as a file
 
-1. Create the folder if it doesn't exist. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+1. Create the folder if it doesn't exist. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`.
 2. Write the summary as a `# ` heading, then the description. With split tickets, write one file per ticket.
 3. Don't commit the file.
 

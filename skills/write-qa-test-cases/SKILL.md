@@ -37,9 +37,8 @@ Where it fits:
 - **No new packages without asking.** If writing an `.xlsx` file needs a library that is missing, ask before installing it.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the ticket and the code. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, database dumps or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -77,14 +76,14 @@ Find the repo root with `git rev-parse --show-toplevel` and the current branch w
 - **A ticket key or pasted ticket** → **Ticket mode** (1A).
 - **A feature, screen, page, route or endpoint** → **Feature mode** (1B).
 - **Nothing was given** → **Branch mode** (1C). If the branch name holds a ticket key (e.g. `feature/ABC-123-...` or `bug/4521-...`), also fetch that ticket as in 1A.
-- **Unclear** (e.g. "test payments"): ask — **What should I write test cases for?** Options: up to 2 best-matching screens or endpoints found in the repo (the closest one Recommended), Changes on this branch, Retry previous answer. Say the user can type a ticket key or feature in **Other**.
+- **Unclear** (e.g. "test payments"): ask — **What should I write test cases for?** Options: up to 2 best-matching screens or endpoints found in the repo (the closest one Recommended), Changes on this branch. Say the user can type a ticket key or feature in **Other**.
 
 ### 1A — Ticket mode
 
 1. Get the ticket:
    - **A Jira key (e.g. `ABC-123`) and a Jira connector is available** — fetch the summary, description, acceptance criteria and linked issues.
    - **An Azure DevOps work item ID (e.g. `4521` or `AB#4521`) and `az` is signed in** (`az account show` succeeds) — run `az boards work-item show --id <id>` and read the title, description and acceptance criteria fields.
-   - **A key but nothing connected** — ask (the first question, so no **Retry previous answer**) — **Ticket details**: Paste the summary, description and acceptance criteria in Other (Recommended), Describe the feature in a few lines in Other.
+   - **A key but nothing connected** — ask — **Ticket details**: Paste the summary, description and acceptance criteria in Other (Recommended), Describe the feature in a few lines in Other.
    - **Pasted text** — use it as is.
 
    Say in one line where the ticket came from. Remember the ticket's system and key — Step 6 uses them.
@@ -143,7 +142,6 @@ Positive, negative and edge cases are always written. Ask — **Which extra grou
 - **Browser and device** — (Recommended for screens) mobile width, the supported browsers, slow network.
 - **Performance** — only when the ticket gives a number, e.g. "loads in under 2 seconds".
 - **None — positive, negative and edge only**.
-- **Retry previous answer** (only if an earlier question was asked this run).
 
 Say the user can type another group in **Other**. If no extra group fits (e.g. a backend-only change with no ID or text input), skip the question and say so in one line.
 
@@ -271,18 +269,16 @@ Ask — **How should I save these test cases?** (multi-select, so the user can p
 - **Shared location** — one of:
   - **Save to <service> — `<folder>`** — when 6a found a saved shared location. (Recommended when one is saved.)
   - **Save to SharePoint or another service** — when none is saved. Sets it up once in 6c.
-- **Retry previous answer**.
 
-The question has room for 4 options. If there are more, keep **Retry previous answer** and the Recommended ones, and fold the rest into one option (e.g. **Markdown or Excel file in the repo**, then ask which in a follow-up).
+The question has room for 4 options. If there are more, keep the Recommended ones, and fold the rest into one option (e.g. **Markdown or Excel file in the repo**, then ask which in a follow-up).
 
-Say the user can type a different folder or file name in **Other**, or "change shared location" to set up 6c again. If the folder doesn't exist, say it will be created and added to `.gitignore`. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+Say the user can type a different folder or file name in **Other**, or "change shared location" to set up 6c again. If the folder doesn't exist, say it will be created and added to `.gitignore`. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`.
 
 **If the user picked Post on ticket** and 6a found test case items for that system, ask — **How should I post to `<key>`?**:
 
 - **Add one comment** (Recommended) — all cases in one comment. Works with no extra setup.
 - **Create test case items** — one <Azure DevOps Test Case work item / Jira Test issue> per case, linked to `<key>`. Testers can run and mark them in <Azure Test Plans / Xray>.
 - **Both** — the comment, plus the linked items.
-- **Retry previous answer**.
 
 With no test case items for that system, skip this question and add a comment.
 
@@ -290,7 +286,7 @@ With no test case items for that system, skip this question and add a comment.
 
 Run only when the user picked **Save to SharePoint or another service**, or typed "change shared location". Never ask for or save passwords, tokens, client secrets or any other credential — only where the file goes.
 
-1. Ask — **Where should test cases be shared?**: SharePoint (Recommended), OneDrive, Google Drive, Confluence, Retry previous answer. Say the user can type another service in **Other**.
+1. Ask — **Where should test cases be shared?**: SharePoint (Recommended), OneDrive, Google Drive, Confluence. Say the user can type another service in **Other**.
 2. Ask for the details that service needs, in one call. Suggest values from the repo name and ticket project where you can:
 
    | Service | Details to ask |
@@ -301,8 +297,8 @@ Run only when the user picked **Save to SharePoint or another service**, or type
    | Confluence | Space key and parent page title |
    | Other | Folder link or path, and how files get there (a connector, a command-line tool, or by hand) |
 
-3. Ask — **File format for the shared copy**: Excel (.xlsx) (Recommended), Markdown (.md), Retry previous answer. Leave this out for Confluence — it gets a page.
-4. Ask — **Sub-folder per ticket?**: No, all files in one folder (Recommended), Yes — one sub-folder per ticket key, Retry previous answer.
+3. Ask — **File format for the shared copy**: Excel (.xlsx) (Recommended), Markdown (.md). Leave this out for Confluence — it gets a page.
+4. Ask — **Sub-folder per ticket?**: No, all files in one folder (Recommended), Yes — one sub-folder per ticket key.
 5. **Save the answers** so later runs don't ask. Add one line to the **Overview** section of `PROJECT_CONTEXT.md`, and a dated row to its **Change log**:
 
    ```markdown
@@ -342,7 +338,7 @@ Write the Step 5 output as the file, with a first line `# Test cases: <ticket ke
 ### 7b — Excel file
 
 1. Use the `xlsx` skill if this session has one. Otherwise write a short Python script in a temporary folder using `openpyxl`.
-2. If `openpyxl` is missing, ask — **Excel needs the `openpyxl` Python library**: Install it with `pip install --user openpyxl` (Recommended), Save as CSV (a plain table file Excel opens) instead, Skip Excel, Retry previous answer.
+2. If `openpyxl` is missing, ask — **Excel needs the `openpyxl` Python library**: Install it with `pip install --user openpyxl` (Recommended), Save as CSV (a plain table file Excel opens) instead, Skip Excel.
 3. Build the workbook:
    - Sheets: **Coverage**, **Positive**, **Negative**, **Edge**, then one per extra group (leave out any group with no cases).
    - Columns: ID, AC, Title, Preconditions, Steps, Test data, Expected result, Priority, plus empty **Status** (Pass / Fail / Blocked dropdown) and **Notes** columns for the tester.
@@ -357,17 +353,17 @@ Write the Step 5 output as the file, with a first line `# Test cases: <ticket ke
    - **GitHub / GitLab** — Markdown.
 2. Start the comment with `Test cases — <n> positive, <n> negative, <n> edge` (plus any extra groups) and the coverage table, then each group. If a file was also saved, add its path at the end. If test case items were also created, list their IDs instead of the full cases.
 3. If the comment is longer than the system allows (Jira and Azure DevOps comments start failing around 32,000 characters), post the coverage table and a short list of case titles, and suggest attaching the `.xlsx` file by hand.
-4. Show the exact comment and the ticket it goes to. Ask — **Post this comment on `<key>`?**: Post it (Recommended), Change the text, Retry previous answer. Post only on yes.
+4. Show the exact comment and the ticket it goes to. Ask — **Post this comment on `<key>`?**: Post it (Recommended), Change the text. Post only on yes.
 5. After posting, give the comment link if the tool returns one. If posting fails, show the error in one line and offer to save as `.md` instead.
 
 ### 7d — Create test case items
 
-1. Check first for test case items already linked to the ticket (a rerun). Show them, and ask: Add only new cases (Recommended), Create all again, Skip, Retry previous answer. Never change or delete existing items.
-2. Show the list to create: `TC-01 — <title>` per line, the item type, the ticket they link to, and the count. Ask — **Create <n> test case items on `<key>`?**: Create them (Recommended), Change the list, Retry previous answer. Create only on yes.
+1. Check first for test case items already linked to the ticket (a rerun). Show them, and ask: Add only new cases (Recommended), Create all again, Skip. Never change or delete existing items.
+2. Show the list to create: `TC-01 — <title>` per line, the item type, the ticket they link to, and the count. Ask — **Create <n> test case items on `<key>`?**: Create them (Recommended), Change the list. Create only on yes.
 3. Create one item per case, titled `TC-01 — <title>`:
    - **Azure DevOps** — `az boards work-item create --type "Test Case" --title "<title>" --fields "Microsoft.VSTS.TCM.Steps=<steps xml>" "Microsoft.VSTS.Common.Priority=<1 High / 2 Medium / 3 Low>"`. Put each step as an action with the expected result on the last step, in the Steps field's XML format (`<steps><step type="ActionStep"><parameterizedString>action</parameterizedString><parameterizedString>expected</parameterizedString></step></steps>`). Put preconditions and test data in the description. Then link it: `az boards work-item relation add --id <ticket id> --relation-type "Tested By" --target-id <new id>`.
    - **Jira (Xray)** — create a **Test** issue in the ticket's project with the steps, test data and expected result in the description. Link it to the ticket with the **Test** link type if the project has one, else **Relates**. Use the issue type and link names the connector returns; don't guess them.
-4. If one item fails, stop, show the error in one line, list what was created so far, and ask: Retry the rest (Recommended), Stop here, Retry previous answer. Don't delete what was created.
+4. If one item fails, stop, show the error in one line, list what was created so far, and ask: Retry the rest (Recommended), Stop here. Don't delete what was created.
 
 ### 7e — Save to the shared location
 
@@ -378,8 +374,8 @@ Done after 7a–7d, using the `**Test cases share:**` line.
    - A connector for that service in this session (e.g. Microsoft 365 or SharePoint for SharePoint and OneDrive, Google Drive, Atlassian for Confluence).
    - SharePoint or OneDrive: the CLI for Microsoft 365 (`m365`), if `m365 status` shows it is signed in — `m365 spo file add --webUrl <site URL> --folder "<library>/<folder path>" --path <file>`.
    - Neither: say in one line that no upload tool is connected, and which connector would make it work. Save the file to the repo folder as in 7-0 and 7a or 7b, and give the exact place to upload it by hand (site, library, folder).
-3. **Check for a file or page with the same name** in that folder. If one exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
-4. Show the file name and the full destination (service, site, folder). Ask — **Upload to <service>?**: Upload (Recommended), Change the folder for this file only, Retry previous answer. Upload only on yes.
+3. **Check for a file or page with the same name** in that folder. If one exists, ask: Replace it (Recommended), Save as `<name>-2`.
+4. Show the file name and the full destination (service, site, folder). Ask — **Upload to <service>?**: Upload (Recommended), Change the folder for this file only. Upload only on yes.
 5. Give the link to the uploaded file or page. If the upload fails, show the error in one line, save the file in the repo folder instead, and say so.
 6. If the saved location no longer exists or access is denied, say so and offer to set it up again (6c).
 

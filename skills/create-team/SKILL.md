@@ -17,9 +17,8 @@ Look at the repo, suggest the specialist agents it needs, and write the ones the
 - **Only write files after the user confirms.** Show the team and the drafts first. Never overwrite an existing agent file without asking.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the scan. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **Don't change anything else.** No installs, builds, commits or pushes. Only create or update files in the chosen agents folder, and the **Team** section of the repo's `CLAUDE.md`.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
@@ -119,12 +118,12 @@ Find which areas of expertise the repo needs. Skip `node_modules`, `.venv`, `ven
    ````
 2. Ask with AskUserQuestion (multiSelect) — **Agents**: list the Core agents first, then Optional ones, up to 4 options. If more than 4 roles were found, add a second question for the rest. Mention that the user can name other roles in **Other**.
 3. Ask the settings in one AskUserQuestion call:
-   - **Save to** — This repo, `.claude/agents/` (Recommended — the whole team gets them when it is committed); Only me, `~/.claude/agents/` (works in every repo, so keep it generic); Retry previous answer.
-   - **Agent names** — Plain role names, e.g. `frontend-dev` (Recommended); Prefix with the repo name, e.g. `<repo>-frontend-dev`; Retry previous answer.
-   - **Model** — Same as the main session, `inherit` (Recommended); A faster, cheaper model (`sonnet`); Retry previous answer.
+   - **Save to** — This repo, `.claude/agents/` (Recommended — the whole team gets them when it is committed); Only me, `~/.claude/agents/` (works in every repo, so keep it generic).
+   - **Agent names** — Plain role names, e.g. `frontend-dev` (Recommended); Prefix with the repo name, e.g. `<repo>-frontend-dev`.
+   - **Model** — Same as the main session, `inherit` (Recommended); A faster, cheaper model (`sonnet`).
 4. **Name clash with an existing agent:**
-   - Made by this skill — ask: Update it (Recommended), Keep it as is, Retry previous answer.
-   - Not made by this skill — ask: Keep it and skip mine (Recommended), Save mine under a new name, Retry previous answer. Never overwrite it.
+   - Made by this skill — ask: Update it (Recommended), Keep it as is.
+   - Not made by this skill — ask: Keep it and skip mine (Recommended), Save mine under a new name. Never overwrite it.
 
 ## Step 4 — Draft the agents
 
@@ -232,7 +231,7 @@ Role-specific content to add:
    - No two agents own the same folder.
 2. Show a short summary per agent (name, owns, description). Show the full text of one agent as a sample in the chat.
 3. Show the **Team** section that will go into `CLAUDE.md` (see Step 6).
-4. Ask with AskUserQuestion — **Drafts**: Looks good, write them (Recommended); Retry with edits; Show all drafts in full; Retry previous answer.
+4. Ask with AskUserQuestion — **Drafts**: Looks good, write them (Recommended); Retry with edits; Show all drafts in full.
    - **Retry with edits** — ask which agent and what to change (scope, name, rules, or **Other**). Change only that, keep the rest, and show the result.
 
    Repeat until the user picks **Looks good**.

@@ -32,9 +32,8 @@ Where it fits:
 - **Report test results honestly.** If a test fails, say so and show the error. Never delete, skip or weaken a test just to make it pass.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the diff and the code. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -71,7 +70,7 @@ Find the repo root with `git rev-parse --show-toplevel` and the current branch w
 
 - **A file path or file name was given** → **Target mode** (1A).
 - **Nothing was given** → **Branch mode** (1B).
-- **Unclear** (e.g. "write tests for payments"): ask — **Which file should I test?** Options: up to 2 best-matching files found in the repo (the closest one Recommended), Changes on this branch, Retry previous answer. Say the user can type a path in **Other**.
+- **Unclear** (e.g. "write tests for payments"): ask — **Which file should I test?** Options: up to 2 best-matching files found in the repo (the closest one Recommended), Changes on this branch. Say the user can type a path in **Other**.
 
 ### 1A — Target mode
 
@@ -97,7 +96,7 @@ Find the repo root with `git rev-parse --show-toplevel` and the current branch w
 
 **Nothing left to test:** say so in one line, list what was dropped and why, and stop.
 
-**More than 15 changed files:** ask — **Which files to test?** Options: Files with the most changed logic (Recommended — name the top 10), All changed files, Retry previous answer. Say the user can name files in **Other**.
+**More than 15 changed files:** ask — **Which files to test?** Options: Files with the most changed logic (Recommended — name the top 10), All changed files. Say the user can name files in **Other**.
 
 ## Step 2 — Load the project
 
@@ -273,7 +272,7 @@ Used when no QA agent exists.
      **Proposed fix:** <one-line change, with a short diff>
      ```
 
-     Then ask — **Possible bug in `<function>`**: Fix the source code (Recommended when the fix is small and in this branch's changed lines), Leave the code and mark the test skipped with a note, The code is right — change the test, Retry previous answer.
+     Then ask — **Possible bug in `<function>`**: Fix the source code (Recommended when the fix is small and in this branch's changed lines), Leave the code and mark the test skipped with a note, The code is right — change the test.
    - **A dependency is missing** (a database, a secret, a running service): that is not a unit test. Mock it, or move the case to **Not run** with the reason.
 3. Run the full test command once all new tests pass. Failures in tests this change didn't touch go under **Already failing**. Don't fix them. A test that failed in 3a and wasn't in the plan also goes there.
 4. If a coverage command exists, run it and note line and branch coverage for each tested file. In Target mode, also note the coverage from before the change if it was measured in 3a. If none exists, say so; don't add a coverage tool.
@@ -335,5 +334,5 @@ Leave out empty sections, except **Tests by file** and **Checks**.
 
 Then ask — **Next step**: Done, leave it uncommitted (Recommended), Commit the tests, Retry with edits.
 
-- **Commit the tests** — show the commit message first (`Add unit tests for <short summary>`, or `Update unit tests for <short summary>` when existing tests changed, then 2–4 bullets of what is covered; start with the ticket key if the branch name has one) and ask: Commit (Recommended), Change the message, Retry previous answer. Commit only the files in the report. Then ask whether to push; push only on yes.
+- **Commit the tests** — show the commit message first (`Add unit tests for <short summary>`, or `Update unit tests for <short summary>` when existing tests changed, then 2–4 bullets of what is covered; start with the ticket key if the branch name has one) and ask: Commit (Recommended), Change the message. Commit only the files in the report. Then ask whether to push; push only on yes.
 - **Retry with edits** — ask what to change (a file, more cases, fewer cases, or **Other**). Change only that, re-run Step 7 and Step 8, and show the report again.

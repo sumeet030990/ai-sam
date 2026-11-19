@@ -15,9 +15,8 @@ Read a ticket, check it is clear and complete, then plan how to build it: which 
 - **Don't guess.** If you can't tell whether something is a gap (for example, a rule that may be documented elsewhere), list it as a question, not a gap.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options built from the ticket, the context files and the code. Mark the best one "(Recommended)".
-  - The user can type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-  - Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question.
 - **No personal or secret data.** Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records
@@ -54,7 +53,7 @@ Tickets, comments, pull request (PR) titles and descriptions, diffs, commit mess
 Use what came with the request first.
 
 - **A Jira key (e.g. `ABC-123`) and a Jira connector is available:** fetch the summary, type, description, acceptance criteria, linked issues and sub-tasks. Say in one line that you fetched it.
-- **A key but no Jira connector:** ask with AskUserQuestion (the first question, so no **Retry previous answer**) — **Ticket details**: Paste the summary, description and acceptance criteria in Other (Recommended), Describe the ticket in a few lines in Other.
+- **A key but no Jira connector:** ask with AskUserQuestion — **Ticket details**: Paste the summary, description and acceptance criteria in Other (Recommended), Describe the ticket in a few lines in Other.
 - **Pasted text or a description:** use it as is.
 
 Check the ticket for personal or secret data (see the ground rules) before going on.
@@ -63,7 +62,7 @@ Check the ticket for personal or secret data (see the ground rules) before going
 
 1. Find the repo root with `git rev-parse --show-toplevel` (the current folder if it isn't a git repo).
 2. Look for `PROJECT_CONTEXT.md` in the repo root or `docs/`, and `SYSTEM_CONTEXT.md` in the parent folder or at the path its **System** section names.
-3. **In a parent folder with several repos:** read `SYSTEM_CONTEXT.md` (or list the subfolders that are git repos) and work out which repos the ticket touches. If it isn't clear, ask — **Repos**: the likely repos (Recommended), All repos, Retry previous answer.
+3. **In a parent folder with several repos:** read `SYSTEM_CONTEXT.md` (or list the subfolders that are git repos) and work out which repos the ticket touches. If it isn't clear, ask — **Repos**: the likely repos (Recommended), All repos.
 4. **No context file:** say in one line "No PROJECT_CONTEXT.md found — the plan will be based on a code scan only." and carry on. Don't stop to ask.
 5. **Release rules.** If a context file has a `## Delivery and release process` section (from `/ai-sam:setup-release-process`), find the ticket's target release (its fix version or sprint, else the next release whose code freeze hasn't started). Get the release date from Jira when the section says so, else from its rules, and count back to the code freeze. Use this for the report's **Target release** line in Step 7.
 
@@ -209,7 +208,6 @@ Ask — **Where should this report go?** (multi-select). Mark as (Recommended) t
 - **Comment on `<KEY>` in <tracker>** — only when 8a found a connected tracker and a key. With a tracker but no key, offer **Comment on a ticket I name in Other**.
 - **Save as a Markdown file** — to `docs/design/<ticket key or short-name>.md`. Say the user can type another path in **Other**.
 - **Keep it in the chat only** — stop here.
-- **Retry previous answer** — go back to the report review.
 
 ### 8c — Comment on the ticket
 
@@ -220,13 +218,13 @@ Ask — **Where should this report go?** (multi-select). Mark as (Recommended) t
    - If a file was also saved, add its path at the end.
    - Never add an image or link to an outside URL that didn't come from the user.
 3. **If it is too long** (Jira and Azure DevOps comments start failing around 32,000 characters), post the verdict, gaps, questions, the **At risk** and **Needs a check** rows, and the list of files to change, and say the full report is in the saved file.
-4. **Show the exact comment and the ticket it goes to.** Ask — **Post this comment on `<KEY>`?**: Post it (Recommended), Change the text, Retry previous answer. Post only on yes.
+4. **Show the exact comment and the ticket it goes to.** Ask — **Post this comment on `<KEY>`?**: Post it (Recommended), Change the text. Post only on yes.
 5. **Shell commands** (`az`, `gh`, `glab`): never put the comment straight on the command line. Write it to a temporary file outside the repo, pass it as `"$(cat <file>)"` or `--body-file <file>`, then delete the file.
 6. **After posting**, give the comment link if the tool returns one. If posting fails, show the error in one line and offer to save as a Markdown file instead.
 
 ### 8d — Save as a file
 
-1. Create the folder if it doesn't exist. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`, Retry previous answer.
+1. Create the folder if it doesn't exist. If a file with the same name exists, ask: Replace it (Recommended), Save as `<name>-2`.
 2. Write the Step 7 report, with a `**Written:** <YYYY-MM-DD>` line under the first heading.
 3. Don't commit the file.
 

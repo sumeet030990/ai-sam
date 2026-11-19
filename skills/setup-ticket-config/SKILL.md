@@ -20,9 +20,8 @@ The file holds four things:
 - **Every question uses AskUserQuestion**, except where a step says to let the user paste text in the chat.
   - Give 1–3 suggested options built from what you already know (the existing config, the repo, earlier answers). Mark the best one "(Recommended)".
   - Put examples and drafts in the option's `preview` so the user can see exactly what they're choosing.
-  - The user can always type their own answer in the built-in **Other** textbox. Say so in the question text.
+  - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
-- **Let the user fix a wrong answer.** Every question after the first has **Retry previous answer** as its last option. If picked, go straight back to the question just before and ask it again with the same options, so the user can enter a new answer. Save the new answer and carry on from there. Picking it again steps back one more question. The user can also say "go back" at any time.
 - **Only ask about what's being changed.** Each section is optional. A section the user skips is left out of the file, and create-ticket falls back to the next file or the standard behaviour for it.
 - **No personal or secret data.** Templates and examples must use placeholders (`<role>`, `<page>`) or made-up data ("Test User", "Applicant A"). Never copy into the file:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
@@ -77,7 +76,7 @@ Keep a local file small: only the sections the person wants different from the t
    - Older versions saved them as `JIRA_CONFIG.md` / `JIRA_CONFIG.local.md` (same paths, same format).
    - If you find an old-named file, ask: **Rename it to TICKET_CONFIG (Recommended)** / **Leave it as is**.
    - On rename, use `git mv` for a tracked file, or a plain rename otherwise. Don't commit.
-2. Ask with AskUserQuestion (first call of the run, so no **Retry previous answer**) — **Which config do you want to set up?**
+2. Ask with AskUserQuestion — **Which config do you want to set up?**
    - **This repo (team)** — writes `TICKET_CONFIG.md` in the repo root. Recommend this when the current folder is a git repo and it has no `TICKET_CONFIG.md` yet.
    - **Just me, this repo (override the team config)** — writes `TICKET_CONFIG.local.md` in the repo root. Recommend this when the repo already has a `TICKET_CONFIG.md`. Offer it only inside a git repo.
    - **Just me (all repos)** — writes `~/.claude/ai-sam/TICKET_CONFIG.md`. Recommend this outside a git repo.
@@ -154,13 +153,13 @@ A custom template **fully replaces** the standard one for that ticket type. Type
    - It has no `**Summary:**` line, or if it does, the line follows Step 1's summary format. (create-ticket shows the summary separately either way.)
    - Note which section holds acceptance criteria, if any, so Step 2's style can be applied to it.
    - Add a one-line HTML comment under any section heading whose purpose isn't obvious, saying what goes there (e.g. `<!-- Which existing features this could break -->`). create-ticket turns these into questions.
-4. Show the cleaned template and ask: **Looks good (Recommended)**, **Retry with edits**, **Retry previous answer**. For **Retry with edits**, ask what to change (Rename a section, Add a section, Remove a section, Other), apply only that, and show it again.
+4. Show the cleaned template and ask: **Looks good (Recommended)**, **Retry with edits**. For **Retry with edits**, ask what to change (Rename a section, Add a section, Remove a section, Other), apply only that, and show it again.
 
 ## Step 4 — Ticket board
 
 Where the team logs its tickets. `/ai-sam:create-ticket` creates tickets here, and `/ai-sam:analyze-ticket` posts its report here. Never ask for or save passwords, tokens or any other credential — only where tickets go.
 
-1. Ask **Where does the team log tickets?**: the tracker the repo points to (Recommended — a Jira key in recent commit messages or branch names suggests Jira; an `azure.com` remote suggests Azure DevOps; a `github.com` or GitLab remote suggests GitHub or GitLab), one or two others from Jira, Azure DevOps, GitHub issues, GitLab issues, Retry previous answer. Bitbucket teams usually log tickets in Jira — say so. Say the user can type another tracker in **Other**, or **Skip** to leave this section out.
+1. Ask **Where does the team log tickets?**: the tracker the repo points to (Recommended — a Jira key in recent commit messages or branch names suggests Jira; an `azure.com` remote suggests Azure DevOps; a `github.com` or GitLab remote suggests GitHub or GitLab), one or two others from Jira, Azure DevOps, GitHub issues, GitLab issues. Bitbucket teams usually log tickets in Jira — say so. Say the user can type another tracker in **Other**, or **Skip** to leave this section out.
 2. **Confirm the connection.** Check whether the picked tracker is connected, using the **Connected when** check in the table below. Skip this for **Other**.
    - Tell the user first, in one line: "`/ai-sam:create-ticket` and `/ai-sam:analyze-ticket` will use this board to read tickets, create tickets and post reports."
    - **Connected:** say so, naming the account or organization if the check shows it.
@@ -179,12 +178,12 @@ Where the team logs its tickets. `/ai-sam:create-ticket` creates tickets here, a
 4. Ask, in one call:
    - **Default labels or components for new tickets** (optional) — suggest any the project already uses; **None** (Recommended when unsure).
    - **Where should analyze-ticket reports go by default?**: Comment on the ticket (Recommended), Markdown file in the repo, Ask each time.
-5. Show the section in a `preview` and ask: **Looks good (Recommended)**, **Retry with edits**, **Retry previous answer**.
+5. Show the section in a `preview` and ask: **Looks good (Recommended)**, **Retry with edits**.
 
 ## Step 5 — Confirm and write
 
 1. Build the file from the **Config file format** below with only the sections the user set (plus, in **Update some sections**, the sections already in the file).
-2. Show the whole file in the chat and ask: **Save it (Recommended)**, **Retry with edits**, **Retry previous answer**.
+2. Show the whole file in the chat and ask: **Save it (Recommended)**, **Retry with edits**.
 3. On **Save it**, write the file. For the user scope, create `~/.claude/ai-sam/` if needed. Overwrite an existing file only after the user has seen the new version in step 2.
 4. For the local scope, check that git ignores the file (`git check-ignore -q TICKET_CONFIG.local.md` from the repo root). If it doesn't, ask **Add TICKET_CONFIG.local.md to .gitignore? (Recommended)** / **No, I'll handle it**, and on yes append the line to the repo root's `.gitignore` (create it if missing). Don't commit either file.
 5. Finish with three short lines:

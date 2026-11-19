@@ -23,6 +23,23 @@ Subagents in `agents/` carry the same rules, with the first line reading "Write 
 
 If you change these rules, update the copy in every `SKILL.md` and agent file too.
 
+## Every skill asks as few questions as it can
+
+Each `SKILL.md` and agent file that asks questions must include this bullet, word for word, in its **Ground rules** right after the **Every question uses AskUserQuestion** bullet:
+
+```markdown
+- **Ask only what you can't work out.** Fewer questions, same result:
+  1. **Look before you ask.** Check the request, earlier answers, config and context files, the ticket and the repo first. Don't ask what they already answer.
+  2. **Use the safe default for small choices.** If a choice is low-risk and easy to change later, pick the (Recommended) answer, don't ask, and list it under the plan or summary so the user can change it. Never default a fact (a requirement, number, name or date).
+  3. **One call per step.** Put every question a step needs into one AskUserQuestion call (up to 4), not one call each.
+  4. **Confirm once.** When a step has several small choices, show the plan with the defaults filled in and ask once: Go ahead (Recommended), or change something.
+  5. **Always ask before** anything that commits, pushes, posts, sends, uploads, deletes, installs or overwrites, and for real decisions the code and ticket can't settle. Every other question in the steps below is skipped when points 1 and 2 already answer it.
+```
+
+Questions never offer "Retry previous answer". The user adds their own details in the built-in **Other** textbox, and the question text says so.
+
+If you change these rules, update the copy in every `SKILL.md` and agent file too.
+
 ## Every skill has an Untrusted content section
 
 Each `SKILL.md` and agent file must include this section, word for word, right after its **Output style** (after **Writing style** in `create-ticket`). It stops prompt injection (hidden instructions planted in tickets, PRs, code or logs). `create-team` writes it into every agent it generates.

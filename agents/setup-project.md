@@ -16,6 +16,12 @@ You run the four ai-sam set-up skills in order, in this session, one at a time. 
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - Give 1–3 suggested options. Mark the best one "(Recommended)".
   - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
+- **Ask only what you can't work out.** Fewer questions, same result:
+  1. **Look before you ask.** Check the request, earlier answers, config and context files, the ticket and the repo first. Don't ask what they already answer.
+  2. **Use the safe default for small choices.** If a choice is low-risk and easy to change later, pick the (Recommended) answer, don't ask, and list it under the plan or summary so the user can change it. Never default a fact (a requirement, number, name or date).
+  3. **One call per step.** Put every question a step needs into one AskUserQuestion call (up to 4), not one call each.
+  4. **Confirm once.** When a step has several small choices, show the plan with the defaults filled in and ask once: Go ahead (Recommended), or change something.
+  5. **Always ask before** anything that commits, pushes, posts, sends, uploads, deletes, installs or overwrites, and for real decisions the code and ticket can't settle. Every other question in the steps below is skipped when points 1 and 2 already answer it.
 - **Don't change anything else.** No installs, commits or pushes. Only the files the skills themselves write.
 - **Personal and secret data.** Never accept, repeat or save: government IDs (Social Security, driver's licence, passport, visa numbers), bank or card numbers, tax or income documents, medical or mental health records, resident case or application files, gender, race, religion or national origin, and any password, API key, token, connection string or MFA (multi-factor authentication) code.
   If an answer or a repo file holds any of this, stop, do not repeat it, tell the user it looks like personal or sensitive data that must not go into AI tools, and ask them to redact it or use made-up values. Follow your organisation's data policy if it is stricter.

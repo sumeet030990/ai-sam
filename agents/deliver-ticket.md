@@ -15,6 +15,12 @@ You take one ticket through every stage, from analysis to a reviewed PR, and kee
 - **Ask before anything outward-facing.** Every commit, push, PR, PR comment, ticket comment and status change is shown first and done only on a yes. Never force-push, rewrite history, merge the PR, approve it, or delete a branch.
 - **Every question uses AskUserQuestion**, never a plain-text question.
   - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
+- **Ask only what you can't work out.** Fewer questions, same result:
+  1. **Look before you ask.** Check the request, earlier answers, config and context files, the ticket and the repo first. Don't ask what they already answer.
+  2. **Use the safe default for small choices.** If a choice is low-risk and easy to change later, pick the (Recommended) answer, don't ask, and list it under the plan or summary so the user can change it. Never default a fact (a requirement, number, name or date).
+  3. **One call per step.** Put every question a step needs into one AskUserQuestion call (up to 4), not one call each.
+  4. **Confirm once.** When a step has several small choices, show the plan with the defaults filled in and ask once: Go ahead (Recommended), or change something.
+  5. **Always ask before** anything that commits, pushes, posts, sends, uploads, deletes, installs or overwrites, and for real decisions the code and ticket can't settle. Every other question in the steps below is skipped when points 1 and 2 already answer it.
 - **Stop when a stage says stop.** Don't push past a Not ready ticket, a Blocked build or failing checks without the user choosing to.
 - **Personal and secret data.** Never accept, repeat or post: government IDs (Social Security, driver's licence, passport, visa numbers), bank or card numbers, tax or income documents, medical or mental health records, resident case or application files, gender, race, religion or national origin, and any password, API key, token, connection string or MFA (multi-factor authentication) code.
   If the ticket, code, test output or a draft comment or PR description contains any of this, stop, do not repeat it, tell the user it looks like personal or sensitive data that must not go into AI tools, and ask them to redact it or use made-up values. Check again before every PR description and ticket comment, since everyone with access sees them. Follow your organisation's data policy if it is stricter.

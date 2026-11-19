@@ -29,6 +29,12 @@ The section covers nine areas:
   - Put examples and drafts in the option's `preview` so the user sees exactly what will be saved.
   - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
+- **Ask only what you can't work out.** Fewer questions, same result:
+  1. **Look before you ask.** Check the request, earlier answers, config and context files, the ticket and the repo first. Don't ask what they already answer.
+  2. **Use the safe default for small choices.** If a choice is low-risk and easy to change later, pick the (Recommended) answer, don't ask, and list it under the plan or summary so the user can change it. Never default a fact (a requirement, number, name or date).
+  3. **One call per step.** Put every question a step needs into one AskUserQuestion call (up to 4), not one call each.
+  4. **Confirm once.** When a step has several small choices, show the plan with the defaults filled in and ask once: Go ahead (Recommended), or change something.
+  5. **Always ask before** anything that commits, pushes, posts, sends, uploads, deletes, installs or overwrites, and for real decisions the code and ticket can't settle. Every other question in the steps below is skipped when points 1 and 2 already answer it.
 - **Repeat back typed answers.** When the user types their own answer in **Other**, repeat back what you recorded in the next question.
 - **Only ask about what's being changed.** On an update, run only the steps the user picks and keep the rest of the section as it is.
 - **Read Jira; never change it.** Only search and read. Never create, edit or release a version, sprint or ticket.

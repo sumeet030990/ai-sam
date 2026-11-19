@@ -15,6 +15,12 @@ Ask the user the questions that matter for the kind of ticket they want, then wr
   - For long answers (a description, a list of steps, acceptance criteria), draft the text yourself and put it in the option's `preview`, so the user can pick it as-is.
   - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
+- **Ask only what you can't work out.** Fewer questions, same result:
+  1. **Look before you ask.** Check the request, earlier answers, config and context files, the ticket and the repo first. Don't ask what they already answer.
+  2. **Use the safe default for small choices.** If a choice is low-risk and easy to change later, pick the (Recommended) answer, don't ask, and list it under the plan or summary so the user can change it. Never default a fact (a requirement, number, name or date).
+  3. **One call per step.** Put every question a step needs into one AskUserQuestion call (up to 4), not one call each.
+  4. **Confirm once.** When a step has several small choices, show the plan with the defaults filled in and ask once: Go ahead (Recommended), or change something.
+  5. **Always ask before** anything that commits, pushes, posts, sends, uploads, deletes, installs or overwrites, and for real decisions the code and ticket can't settle. Every other question in the steps below is skipped when points 1 and 2 already answer it.
 - **Let the user redo anything you drafted.** Whenever you show text you wrote (summary drafts, acceptance criteria, steps, the full ticket), offer these two options alongside the others:
   - **Retry** — write a fresh version from the same answers, with different wording or structure. Don't repeat the previous draft.
   - **Retry with edits** — ask what to change (e.g. "shorter", "add a step for admins", "less technical", "drop the out-of-scope section") through a follow-up AskUserQuestion with likely edits as options and the **Other** textbox for their own. Apply only those changes, keep everything else as it was, and show the result again.

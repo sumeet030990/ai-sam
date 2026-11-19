@@ -46,6 +46,12 @@ Where it fits:
   - Give 1–3 suggested options built from the ticket and the code. Mark the best one "(Recommended)".
   - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
+- **Ask only what you can't work out.** Fewer questions, same result:
+  1. **Look before you ask.** Check the request, earlier answers, config and context files, the ticket and the repo first. Don't ask what they already answer.
+  2. **Use the safe default for small choices.** If a choice is low-risk and easy to change later, pick the (Recommended) answer, don't ask, and list it under the plan or summary so the user can change it. Never default a fact (a requirement, number, name or date).
+  3. **One call per step.** Put every question a step needs into one AskUserQuestion call (up to 4), not one call each.
+  4. **Confirm once.** When a step has several small choices, show the plan with the defaults filled in and ask once: Go ahead (Recommended), or change something.
+  5. **Always ask before** anything that commits, pushes, posts, sends, uploads, deletes, installs or overwrites, and for real decisions the code and ticket can't settle. Every other question in the steps below is skipped when points 1 and 2 already answer it.
 - **No personal or secret data.** Never open `.env` files, secrets, keys, database dumps or data files that may hold real people's records. Never ask for, copy or repeat:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth
   - government IDs, bank or card numbers, tax, income, medical or case/application records

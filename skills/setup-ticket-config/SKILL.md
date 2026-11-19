@@ -22,6 +22,12 @@ The file holds four things:
   - Put examples and drafts in the option's `preview` so the user can see exactly what they're choosing.
   - The user can always add their own details in the built-in **Other** textbox. Every question with options must say so in the question text, e.g. "…or type your own details in Other".
   - Group up to 4 related questions in one call.
+- **Ask only what you can't work out.** Fewer questions, same result:
+  1. **Look before you ask.** Check the request, earlier answers, config and context files, the ticket and the repo first. Don't ask what they already answer.
+  2. **Use the safe default for small choices.** If a choice is low-risk and easy to change later, pick the (Recommended) answer, don't ask, and list it under the plan or summary so the user can change it. Never default a fact (a requirement, number, name or date).
+  3. **One call per step.** Put every question a step needs into one AskUserQuestion call (up to 4), not one call each.
+  4. **Confirm once.** When a step has several small choices, show the plan with the defaults filled in and ask once: Go ahead (Recommended), or change something.
+  5. **Always ask before** anything that commits, pushes, posts, sends, uploads, deletes, installs or overwrites, and for real decisions the code and ticket can't settle. Every other question in the steps below is skipped when points 1 and 2 already answer it.
 - **Only ask about what's being changed.** Each section is optional. A section the user skips is left out of the file, and create-ticket falls back to the next file or the standard behaviour for it.
 - **No personal or secret data.** Templates and examples must use placeholders (`<role>`, `<page>`) or made-up data ("Test User", "Applicant A"). Never copy into the file:
   - names tied to records, email addresses, phone numbers, home addresses, dates of birth

@@ -54,6 +54,7 @@ ASK_WRITE_FILE_PATTERNS = [
     (r"(^|/)\.claude/(hooks|agents|commands|skills)/", "Claude agents, hooks or skills"),
     (r"(^|/)CLAUDE(\.local)?\.md$", "CLAUDE.md (instructions every session follows)"),
     (r"(^|/)\.mcp\.json$", "MCP server config (tools the AI can call)"),
+    (r"(^|/)QA_CONTEXT\.md$", "QA_CONTEXT.md (extra context the qa-engineer agent follows)"),
     (r"(^|/)\.github/workflows/", "a CI pipeline"),
     (r"(^|/)(azure-pipelines|\.gitlab-ci|bitbucket-pipelines)\.ya?ml$", "a CI pipeline"),
     (r"(^|/)\.(npmrc|yarnrc(\.yml)?|pypirc)$", "where packages are downloaded from"),

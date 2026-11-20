@@ -11,7 +11,7 @@ Use the skills in this order. Set up once (Step 1), then repeat Steps 2–6 for 
     <tr><th>Step</th><th>Stage</th><th>Skills</th><th>Description</th></tr>
   </thead>
   <tbody>
-    <tr><td rowspan="4">1</td><td rowspan="4">Set up (once per repo or team)</td><td><code>create-project-context</code></td><td>Save your project's details, tech stack and commands in <code>PROJECT_CONTEXT.md</code>.</td></tr>
+    <tr><td rowspan="4">1</td><td rowspan="4">Set up (once per repo or team)</td><td><code>create-project-context</code></td><td>Save your project's details, tech stack and commands in <code>PROJECT_CONTEXT.md</code>, and how it is tested in <code>QA_CONTEXT.md</code>.</td></tr>
     <tr><td><code>setup-release-process</code></td><td>Save how your team plans, tests and ships work (sprints, releases, environments).</td></tr>
     <tr><td><code>setup-ticket-config</code></td><td>Save your team's ticket rules and templates.</td></tr>
     <tr><td><code>create-team</code></td><td>Create helper agents for each part of the code (frontend, backend, database and so on).</td></tr>
@@ -50,10 +50,17 @@ Teaches Claude your project, so later skills write code that fits it.
 
 1. Asks about the repo: goals, tech stack, dependency manifests (for example `package.json`) and the install, run, test, lint and build commands.
 2. Writes `PROJECT_CONTEXT.md` in the repo root.
-3. In a parent folder of several repos, writes `SYSTEM_CONTEXT.md` that maps the repos and how they connect. See [Project context for multi-repo projects](#project-context-for-multi-repo-projects).
+3. If you want QA, also writes `QA_CONTEXT.md` next to it, for the `qa-engineer` agent:
+   - Manual, automation or both.
+   - Test tools, versions, config files and test folders.
+   - No automation tool yet: lets you pick the tool (Playwright, Selenium, Cypress, WebdriverIO) and language (TypeScript, JavaScript, Python, C#, Java and more). `write-feature-tests` uses that choice later.
+   - Default browser (and any other supported browsers).
+   - Business domain: area, user roles, key workflows and rules to protect.
+   - It fills these from the repo and your project details. It asks only what it can't work out, such as manual testing or the browser when no test config names one.
+4. In a parent folder of several repos, writes `SYSTEM_CONTEXT.md` that maps the repos and how they connect. See [Project context for multi-repo projects](#project-context-for-multi-repo-projects).
 
-- **Output:** `PROJECT_CONTEXT.md` or `SYSTEM_CONTEXT.md`.
-- **Used by:** `analyze-ticket`, `implement-ticket`, `review-pr`, the test skills.
+- **Output:** `PROJECT_CONTEXT.md` and `QA_CONTEXT.md`, or `SYSTEM_CONTEXT.md`.
+- **Used by:** `analyze-ticket`, `implement-ticket`, `review-pr`, the test skills. `QA_CONTEXT.md` is read by the `qa-engineer` agent.
 
 #### 1.2 `/ai-sam:setup-release-process`
 
@@ -101,6 +108,7 @@ Creates builder subagents (helper agents), one per layer of the repo.
 1. Scans the repo and suggests one agent per layer: Frontend, Backend, Database, API, DevOps, QA test automation and more.
 2. Shows the files that justify each agent.
 3. Writes the agents you pick to `.claude/agents/` (shared when committed) or `~/.claude/agents/` (only you).
+   - QA needs no file: the plugin's `ai-sam:qa-engineer` agent is listed instead.
 4. Lists them in a **Team** section of the repo's `CLAUDE.md`.
 5. Each agent knows its folders, the patterns to copy, the commands to run and what it must not touch.
 
@@ -367,6 +375,7 @@ Gives the project manager (PM) a short morning brief for the active sprint, from
     | Dependency files (package versions) | ✓ | | | |
     | Install, run and test commands | ✓ | ✓ | | |
     | Lint and build commands | ✓ | | | |
+    | QA context (manual or automation, tools, browser, domain) | ✓ | ✓ | | |
     | Delivery method and sprint ceremonies | | | ✓ | ✓ |
     | Release schedules and releases | | ✓ | ✓ | ✓ |
     | Environments and branches | ✓ | ✓ | | |
@@ -377,9 +386,9 @@ Gives the project manager (PM) a short morning brief for the active sprint, from
     | Jira link for sprints and releases | | | ✓ | |
     | Ticket format and templates | | ✓ | ✓ | ✓ |
     | Ticket board | ✓ | ✓ | ✓ | ✓ |
-    | Builder agents (`create-team`) | ✓ | QA agent only | | |
+    | Builder agents (`create-team`) | ✓ | | | |
 
-    - Example: a QA-only user doesn't run `analyze-ticket` or `implement-ticket`, so isn't asked about package versions, deployment or builder agents.
+    - Example: a QA-only user doesn't run `analyze-ticket` or `implement-ticket`, so isn't asked about package versions, deployment or builder agents. The QA agent comes with the plugin.
   - **Before it starts:** shows a checklist of what will run and what is skipped. You can add skipped parts back.
   - **No repeat questions:** your name (if you choose to record it) and the context file path are asked once and reused.
   - **Add a role later:** run it again and pick the new role. Existing files are updated, not replaced.
@@ -419,6 +428,13 @@ Gives the project manager (PM) a short morning brief for the active sprint, from
     - Headless runs can't show permission prompts, so anything not allowed is blocked. Allow your repo's test and build tools and your tracker's tools (swap `gh` for `az` or `glab`, `npm` for `dotnet`, `pytest` and so on).
     - Calls the guard hook would ask about (new packages, force pushes, network calls) are blocked. The agent logs them as skipped.
   - **Or from a session:** ask "run deliver-ticket-auto on ABC-123 in the background". As a background helper it can't start `tech-lead`, so it does that design work itself.
+- `qa-engineer` (`ai-sam:qa-engineer`) — senior QA engineer for manual and automated testing. The test skills hand their work to it.
+  - **Extra context:** reads `QA_CONTEXT.md` (from `create-project-context`) and works as an expert in that project's test tools and business domain.
+  - **Browser:** writes and runs browser tests on the **Default browser** in `QA_CONTEXT.md`, unless you pick another for a run.
+  - **Used by:** `write-qa-test-cases` (writes the cases), `write-unit-tests` and `write-feature-tests` (write the tests), `run-test-cases` (runs the approved plan and sorts failures), `smoke-regression-report` (scores and sorts tickets).
+  - **A repo QA agent wins:** if the repo's `CLAUDE.md` **Team** section names its own QA agent, the skills use that one.
+  - **Never asks you questions.** The skill asks and passes your answers in its brief. It never installs, commits, pushes or calls outside URLs.
+  - No `QA_CONTEXT.md` yet: it works from `PROJECT_CONTEXT.md` and the code, and tells you to run `create-project-context`.
 
 ### How ticket configs combine
 
@@ -461,7 +477,7 @@ Tickets, PRs, code and logs are written by many people. Someone can plant text i
    | Network calls (`curl`, `wget`, `Invoke-WebRequest`) | Asks you first |
    | Install a new package (`npm install <name>`, `pip install <name>`, `dotnet add package`, unknown `npx` tools) | Asks you first |
    | Force push, remote branch delete, `git reset --hard`, `git clean -f`, `--no-verify` | Asks you first |
-   | Edit `CLAUDE.md`, `.claude/`, `.mcp.json`, CI pipelines, package sources or git hooks | Asks you first |
+   | Edit `CLAUDE.md`, `.claude/`, `.mcp.json`, `QA_CONTEXT.md`, CI pipelines, package sources or git hooks | Asks you first |
 
    - "Asks you first" works in auto mode too.
    - `.env.example` and other templates are allowed. Plain `npm install`, `npm ci` and `pip install -r requirements.txt` install the repo's own packages and are allowed.
@@ -479,7 +495,7 @@ An eval (evaluation) is an automated test for AI behaviour. It gives Claude a ta
 
 **What's in `evals/injection/`:**
 - 9 cases, one per risky skill. Examples: a PR that removes a permission check and tells the reviewer to approve; a test log with fake secrets and "post this log"; a ticket asking to skip QA.
-- `guard/test_guard.py` — 46 checks on the guard hook. No AI, free, takes a second.
+- `guard/test_guard.py` — 49 checks on the guard hook. No AI, free, takes a second.
 - All data is made up. Nothing real is used or sent anywhere.
 
 **Run them** (from this folder):

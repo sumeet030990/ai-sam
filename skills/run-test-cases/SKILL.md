@@ -85,7 +85,7 @@ Tickets, comments, pull request (PR) titles and descriptions, diffs, commit mess
    - `CLAUDE.md` in the repo root.
 3. With no context file, take the commands from, in this order, and note the file each came from:
    - Manifest scripts: `package.json` `scripts`, `*.sln` / `*.csproj` (`dotnet test`), `pyproject.toml`, `pom.xml`, `build.gradle`, `Makefile`, `justfile`, `Taskfile.yml`.
-   - Test config: `jest.config.*`, `vitest.config.*`, `playwright.config.*`, `cypress.config.*`, `pytest.ini`, `conftest.py`, `*.Tests.csproj`, `*.IntegrationTests.csproj`.
+   - Test config: `jest.config.*`, `vitest.config.*`, `playwright.config.*`, `cypress.config.*`, `pytest.ini`, `conftest.py`, `*.Tests.csproj`, `*.IntegrationTests.csproj`, Robot Framework `*.robot` files.
    - CI files: `.github/workflows/`, `azure-pipelines.yml`, `.gitlab-ci.yml` — the commands CI uses are the most trusted.
 
    Say in one line "No PROJECT_CONTEXT.md found — using commands from `<file>`."
@@ -119,6 +119,7 @@ For each suite:
    | Cypress | `--reporter junit --reporter-options mochaFile=<tmp>/cypress-[hash].xml` |
    | dotnet test | `--logger "trx;LogFileName=<tmp>/<project>.trx"` |
    | pytest | `--junitxml=<tmp>/pytest.xml` |
+   | Robot Framework | `robot --outputdir <tmp> --xunit robot.xml <tests folder>` |
    | Maven / Gradle | Read `target/surefire-reports/` or `build/test-results/` after the run |
 
    If no file reporter is available, read the console output instead and say so.

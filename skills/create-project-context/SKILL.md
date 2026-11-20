@@ -171,7 +171,7 @@ Ask one AskUserQuestion per purpose (up to 4 per call), with the commands you fo
 `QA_CONTEXT.md` tells the `ai-sam:qa-engineer` agent and the test skills how this project is tested, so the agent works as an expert in this stack and this business area. Fill it from what you already know. Ask only for the gaps.
 
 1. **Work these out first, without asking:**
-   - **Automation tools** — test tools and versions from Step 2 and the manifests, each with its config file (`playwright.config.*`, `cypress.config.*`, `wdio.conf.*`, `jest.config.*`, `vitest.config.*`, `pytest.ini`, `*.Tests.csproj`) and test folder.
+   - **Automation tools** — test frameworks, tools and versions from Step 2 and the manifests, each with its config file (`playwright.config.*`, `cypress.config.*`, `wdio.conf.*`, `jest.config.*`, `vitest.config.*`, `pytest.ini`, `*.Tests.csproj`) and test folder. Robot Framework shows as `*.robot` files and `robotframework` in a Python manifest; Cucumber / BDD as `.feature` files.
    - **Default browser** — from the end-to-end (E2E) test config: Playwright `projects`, `use.browserName` or `channel`; Cypress `browser` in the config or `--browser` in a test script; WebdriverIO `capabilities.browserName`. The first one listed is the default; the rest are **Also supported**.
    - **Domain** — draft from the Step 1 description and goal, the README and the code:
      - business area (e.g. "affordable housing programs")
@@ -184,22 +184,41 @@ Ask one AskUserQuestion per purpose (up to 4 per call), with the commands you fo
    - **Default browser** — only for a project with screens when no E2E config names one: Chrome (Recommended), Edge, Firefox, Safari. For an API, library or CLI, record `Not applicable` and don't ask.
    - **Standards testers must check** — only for a web or mobile app, when the README doesn't name any: WCAG 2.1 AA accessibility (Recommended for public-facing apps), None to record.
    - **Business area** — only when there is nothing to draft it from (e.g. a new project): To be decided, Not applicable.
-3. **Pick the automation tool and language** — only when **Both** or **Automation only** was picked and the repo has no tool for that kind of test. Ask in one AskUserQuestion call, and say the user can type another tool or language in **Other**:
-   - **Browser test tool** (for a project with screens): Playwright (Recommended — fast, built-in waits, runs Chrome, Edge, Firefox and Safari); Selenium WebDriver (widest language support, many teams know it); Cypress (JavaScript or TypeScript only); WebdriverIO.
-   - **Language for the tests**: the repo's main language first, marked (Recommended); then the other languages the tool supports, up to 4.
-   - **API test tool** (for a project with an API, when no integration test tool exists): the tool that fits the backend first, marked (Recommended) — e.g. WebApplicationFactory + xUnit for .NET, Supertest for Node, pytest + `TestClient` for FastAPI, REST Assured for Java; then Playwright API testing; Postman / Newman.
+3. **Pick the automation stack** — only when **Both** or **Automation only** was picked and the repo has no tool for that kind of test. First the tool and language, then an optional framework on top. Say the user can type their own choice in **Other** each time.
 
-   Languages each browser tool supports:
+   **Call 1 — Tool and language** (one call, up to 3 questions):
+   - **Browser test tool** (for a project with screens): Playwright (Recommended — fast, built-in waits, runs Chrome, Edge, Firefox and Safari); Selenium WebDriver (widest language support, many teams know it); Cypress; WebdriverIO. For a mobile app: Appium.
+   - **Language**: the repo's main language first, marked (Recommended); then the others the tool supports, up to 4:
 
-   | Tool | Languages |
-   |---|---|
-   | Playwright | TypeScript, JavaScript, Python, C#, Java |
-   | Selenium WebDriver | Java, Python, C#, JavaScript, TypeScript, Ruby, Kotlin |
-   | Cypress | TypeScript, JavaScript |
-   | WebdriverIO | TypeScript, JavaScript |
+     | Tool | Languages |
+     |---|---|
+     | Playwright | TypeScript, JavaScript, Python, C#, Java |
+     | Selenium WebDriver | Java, Python, C#, JavaScript, TypeScript, Ruby, Kotlin |
+     | Cypress | TypeScript, JavaScript |
+     | WebdriverIO | TypeScript, JavaScript |
+     | Appium | Java, Python, JavaScript, TypeScript, C# |
 
-   If the user picks a language the tool doesn't support (e.g. Cypress with Python), say so and ask the language again with only the supported ones.
-   Record the choice under **Chosen for new tests**. Install nothing here; `write-feature-tests` adds the tool later, on a yes.
+   - **API test tool** (for a project with an API and no integration test tool): the backend's own tool (Recommended — e.g. WebApplicationFactory + xUnit for .NET, Supertest for Node, pytest + `TestClient` for FastAPI, REST Assured for Java); Playwright API testing; Postman / Newman.
+
+   **Call 2 — Framework on top** (how tests are written and organised). Offer only the options that fit the tool from Call 1:
+
+   | Option | What it means | Fits |
+   |---|---|---|
+   | No framework — the tool's own runner | Tests are plain code in the chosen language, e.g. Playwright Test in TypeScript. Recommended when developers write most tests. | Every tool |
+   | Robot Framework on top | Tests are written as plain-English keyword steps in `.robot` files and run by Robot Framework. Recommended when testers write most tests. | Playwright (Browser library), Selenium (SeleniumLibrary), Appium (AppiumLibrary) |
+   | Both, side by side | Plain tool tests (e.g. Playwright + TypeScript) **and** Robot Framework suites in one repo, each in its own folder. | Playwright, Selenium, Appium |
+   | Cucumber / BDD on top | Tests are Given / When / Then steps in `.feature` files. | Playwright, Selenium, WebdriverIO, Cypress (with a Cucumber plugin) |
+
+   What Robot Framework means for the language picked in Call 1:
+   - Robot Framework runs on Python, so the test machine needs Python as well as the tool.
+   - **Playwright:** the Browser library runs Playwright for Robot. Custom keywords can be written in JavaScript (TypeScript compiled to JavaScript) through its `jsextension` option, or in Python. So "Playwright + TypeScript + Robot Framework" works: `.robot` tests, TypeScript helpers.
+   - **Selenium or Appium:** custom keywords are written in Python, whatever language was picked. Say so before recording it.
+   - Cypress and WebdriverIO don't work with Robot Framework. Don't offer it for them.
+
+   **Both, side by side** — also ask, in the same call: **Where do new end-to-end tests go?** Robot Framework suites (Recommended — testers can read and change them); Playwright / tool tests; Ask me each time. Robot suites go in `robot/` (or the folder the repo already uses); tool tests stay in the tool's folder (e.g. `e2e/`).
+
+   - If the user types a pair that doesn't work (e.g. Cypress with Robot Framework), say so and ask again with only the options that fit.
+   - Record the choice under **Chosen for new tests**, e.g. "Playwright + TypeScript, with Robot Framework on top (Browser library; custom keywords in TypeScript); API: Supertest; new E2E tests go in Robot suites". Install nothing here; `write-feature-tests` adds it later, on a yes.
 4. **No QA context — skip:** write no `QA_CONTEXT.md`. Say in the Step 4 summary that `qa-engineer` will work from a code scan.
 5. **Existing `QA_CONTEXT.md`:** read it first. Re-check the tool versions, config files and default browser against the repo, and show what changed. Keep every row the user doesn't change.
 6. The domain draft is confirmed with the rest in the Step 4 summary, not with its own question.
@@ -397,13 +416,13 @@ Read by the `ai-sam:qa-engineer` agent and the ai-sam test skills. Settings only
 
 <Remove this section for Manual only.>
 
-| Layer | Tool | Version | Config file | Test folder |
-|---|---|---|---|---|
-| <Frontend unit> | <Vitest> | <2.1> | `<vitest.config.ts>` | `<src/**/*.test.tsx>` |
-| <End to end (E2E)> | <Playwright> | <1.48> | `<playwright.config.ts>` | `<e2e/>` |
-| <API / integration> | <xUnit + WebApplicationFactory> | <2.9> | `<tests/Api.IntegrationTests.csproj>` | `<tests/Api.IntegrationTests/>` |
+| Layer | Framework | Tool | Version | Config file | Test folder |
+|---|---|---|---|---|---|
+| <Frontend unit> | <Vitest> | <Vitest> | <2.1> | `<vitest.config.ts>` | `<src/**/*.test.tsx>` |
+| <End to end (E2E)> | <Playwright Test / Robot Framework / Cucumber> | <Playwright> | <1.48> | `<playwright.config.ts>` | `<e2e/>` |
+| <API / integration> | <xUnit> | <WebApplicationFactory> | <2.9> | `<tests/Api.IntegrationTests.csproj>` | `<tests/Api.IntegrationTests/>` |
 
-- **Chosen for new tests:** <e.g. Browser: Playwright with TypeScript; API: Supertest — not set up yet, `write-feature-tests` adds it on a yes. Remove this line when the tools above are already set up.>
+- **Chosen for new tests:** <e.g. Playwright + TypeScript, with Robot Framework on top (Browser library; custom keywords in TypeScript); API: Supertest; new E2E tests go in Robot suites — not set up yet, `write-feature-tests` adds it on a yes. Remove this line when the tools above are already set up.>
 - **Test data:** <where fixtures, factories or seed scripts live>
 - **Test logins:** <environment variable names only, e.g. `E2E_USER`, `E2E_PASSWORD` — or remove this line>
 

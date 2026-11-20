@@ -53,7 +53,7 @@ Teaches Claude your project, so later skills write code that fits it.
 3. If you want QA, also writes `QA_CONTEXT.md` next to it, for the `qa-engineer` agent:
    - Manual, automation or both.
    - Test tools, versions, config files and test folders.
-   - No automation tool yet: lets you pick the tool (Playwright, Selenium, Cypress, WebdriverIO) and language (TypeScript, JavaScript, Python, C#, Java and more). `write-feature-tests` uses that choice later.
+   - No automation tool yet: lets you pick the tech stack — the tool and language, e.g. Playwright with TypeScript or JavaScript, Selenium with Java or Python, Cypress, WebdriverIO — and the API test tool. `write-feature-tests` uses that choice later.
    - Default browser (and any other supported browsers).
    - Business domain: area, user roles, key workflows and rules to protect.
    - It fills these from the repo and your project details. It asks only what it can't work out, such as manual testing or the browser when no test config names one.

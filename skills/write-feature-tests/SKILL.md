@@ -146,6 +146,7 @@ Work out, from the repo, and note the file that shows each:
 | Frontend E2E tool | `playwright.config.*`, `cypress.config.*`, `wdio.conf.*`, Selenium in the manifest |
 | Backend integration tool | `WebApplicationFactory`, Testcontainers, Supertest, FastAPI or Django `TestClient`, `@SpringBootTest` / MockMvc, RestAssured |
 | BDD tool (Gherkin) | `.feature` files with Reqnroll / SpecFlow, Cucumber, behave, pytest-bdd |
+| Keyword-driven tool | Robot Framework: `*.robot` files, `robotframework` in `requirements.txt` or `pyproject.toml`, Browser library or SeleniumLibrary |
 | Test folder and naming | `e2e/`, `tests/e2e/`, `cypress/e2e/`, `*.IntegrationTests/`, `tests/integration/`; file and test names |
 | Page objects and helpers | Page object classes (a class per screen that holds its selectors and actions), custom commands, API clients for tests |
 | Selectors | `data-testid`, role and label, or text — whichever the repo's tests use |
@@ -158,6 +159,7 @@ Then, for the feature:
 
 - **Existing feature tests for it** — search test files for the route, page, endpoint, page object or feature name. New tests go there. Don't make a second file.
 - **The closest existing feature test** — one for a similar screen or endpoint. Copy its structure, data setup and login.
+- **Robot Framework** — write `.robot` test cases and keywords only if the repo already uses it. Reuse existing resource files and keywords.
 - **Gherkin** — write `.feature` files only if the repo already uses a BDD tool. Otherwise write plain test code, and use Given / When / Then only in the plan and in test names or comments, as the repo does.
 
 ### 3a — Check the existing tests
@@ -176,7 +178,7 @@ If it is unclear whether the code or the test is right, don't guess. Add it to *
 **No feature test tool for a layer the feature touches:** ask — **No `<frontend E2E / backend integration>` setup found** — and say the user can type another tool or language in **Other**:
 
 - **`QA_CONTEXT.md` has Chosen for new tests:** Add `<that tool, in that language>` (Recommended — name the packages, files and any browsers or images it downloads), Skip this layer. Don't ask the tool or language again.
-- **Nothing chosen:** offer the tools with their language, the repo's main language first: Playwright with `<language>` (Recommended), Selenium WebDriver with `<language>`, Cypress with TypeScript, Skip this layer. For the backend, offer the API tool that fits the stack (Recommended), Playwright API testing, Skip this layer. Offer only supported pairs: Playwright — TypeScript, JavaScript, Python, C#, Java; Selenium WebDriver — Java, Python, C#, JavaScript, TypeScript, Ruby, Kotlin; Cypress and WebdriverIO — TypeScript, JavaScript.
+- **Nothing chosen:** ask the tech stack in one call: Playwright with `<repo language>` (Recommended), Selenium WebDriver with `<repo language>`, Cypress with TypeScript, Skip this layer. For the backend, offer the API tool that fits the stack (Recommended), Playwright API testing, Skip this layer. Offer only pairs that work: Playwright — TypeScript, JavaScript, Python, C#, Java; Selenium — Java, Python, C#, JavaScript, TypeScript, Ruby, Kotlin; Cypress and WebdriverIO — TypeScript, JavaScript. Don't ask about a test framework.
 
 Add packages only on a yes. After adding, update **Chosen for new tests** in `QA_CONTEXT.md` to a row in **Automation tools**, on a yes.
 
